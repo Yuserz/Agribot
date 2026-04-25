@@ -1,8 +1,9 @@
-import { Colors } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+
+import { Colors } from "@/constants/theme";
 
 export default function SplashScreen() {
   const router = useRouter();
