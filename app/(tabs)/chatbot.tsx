@@ -105,10 +105,7 @@ export default function ChatbotScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={["top", "left", "right", "bottom"]}
-    >
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
@@ -180,12 +177,14 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   messagesList: {
     paddingHorizontal: 16,
     paddingVertical: 16,
     paddingTop: 12,
-    paddingBottom: 20,
+    paddingBottom: 12,
     flexGrow: 1,
     justifyContent: "flex-end",
   },
