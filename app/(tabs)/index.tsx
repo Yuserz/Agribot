@@ -164,15 +164,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   headerSection: {
     backgroundColor: Colors.agribot.primary,
     paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
   greeting: {
     fontSize: 32,
@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginTop: 20,
+    marginBottom: 0,
     padding: 20,
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: 16,
@@ -231,7 +232,8 @@ const styles = StyleSheet.create({
   },
   section: {
     marginHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 20,
+    marginTop: 8,
   },
   sectionTitle: {
     fontSize: 18,
@@ -272,6 +274,8 @@ const styles = StyleSheet.create({
   },
   progressSection: {
     marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 24,
     backgroundColor: Colors.agribot.primary,
     borderRadius: 16,
     padding: 20,
