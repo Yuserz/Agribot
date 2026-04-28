@@ -1,182 +1,291 @@
-import { ThemedView } from "@/components/themed-view";
-import { BOTPRESS_BOT_CONFIG, BOTPRESS_URL } from "@/constants/botpress";
-import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Colors } from "@/constants/theme";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { WebView, WebViewMessageEvent } from "react-native-webview";
+
+interface Message {
+  id: string;
+  text: string;
+  sender: "bot" | "user";
+  timestamp: Date;
+}
 
 export default function ChatbotScreen() {
-  const webViewRef = useRef<WebView>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAvailable, setIsAvailable] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const timeoutRef = useRef<number | null>(null);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "1",
+      text: "Hello! I'm AgriBot, your dragon fruit farming assistant. How can I help you today? 🌱",
+      sender: "bot",
+      timestamp: new Date(),
+    },
+  ]);
+  const [inputText, setInputText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const flatListRef = useRef<FlatList>(null);
 
-  useEffect(() => {
-    // Set a timeout to show fallback message if chatbot doesn't load
-    timeoutRef.current = setTimeout(() => {
-      if (isLoading) {
-        setIsAvailable(false);
-        setLoadError(
-          "Chatbot service is temporarily unavailable. Please try again later.",
-        );
-        setIsLoading(false);
-      }
-    }, 10000); // 10 seconds timeout
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+  const handleSendMessage = async () => {
+    if (inputText.trim() === "") return;
+
+    // Add user message
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: inputText,
+      sender: "user",
+      timestamp: new Date(),
     };
-  }, [isLoading]);
 
-  const handleLoadEnd = () => {
-    setIsLoading(false);
-    setIsAvailable(true);
-    setLoadError(null);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
+    setIsLoading(true);
+
+    // Simulate bot response delay
+    setTimeout(() => {
+      const botMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "Thank you for your question! I'm here to help with your dragon fruit farming needs. This is a placeholder response. 🌿",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setIsLoading(false);
+    }, 800);
+
+    // Scroll to bottom
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
   };
 
-  const handleLoadError = (error: any) => {
-    console.log("WebView error:", error.nativeEvent);
-    setIsAvailable(false);
-    setLoadError(
-      "Failed to load chatbot. Please check your connection and try again.",
+  const renderMessage = ({ item }: { item: Message }) => {
+    const isBot = item.sender === "bot";
+
+    if (isBot) {
+      return (
+        <View style={styles.botMessageContainer}>
+          <View style={styles.botIconContainer}>
+            <MaterialCommunityIcons
+              name="robot-outline"
+              size={24}
+              color={Colors.ui.white}
+            />
+          </View>
+          <View style={[styles.messageBubble, styles.botMessage]}>
+            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+          </View>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.userMessageContainer}>
+        <View style={[styles.messageBubble, styles.userMessage]}>
+          <Text style={styles.userMessageText}>{item.text}</Text>
+        </View>
+      </View>
     );
-    setIsLoading(false);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
   };
-
-  const handleWebViewMessage = (event: WebViewMessageEvent) => {
-    try {
-      const data = JSON.parse(event.nativeEvent.data);
-      console.log("Message from WebView:", data);
-    } catch {
-      console.log("WebView message:", event.nativeEvent.data);
-    }
-  };
-
-  const injectedJavaScript = `
-    (function() {
-      document.documentElement.style.height = '100%';
-      document.body.style.height = '100%';
-      document.body.style.margin = '0';
-      document.body.style.padding = '0';
-      // Example: notify RN when loaded
-      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'loaded' }));
-    })();
-    true;
-  `;
-
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-          html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          }
-          #bp-web-widget-container {
-            height: 100%;
-            width: 100%;
-          }
-        </style>
-      </head>
-      <body>
-        <div id="bp-web-widget-container"></div>
-        <script src="${BOTPRESS_URL}"></script>
-        <script src="${BOTPRESS_BOT_CONFIG}" defer></script>
-      </body>
-    </html>
-  `;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ThemedView style={styles.content}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.messagesList}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: true })
+          }
+        />
+
         {isLoading && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0a7ea4" />
+            <View style={styles.botIconContainer}>
+              <MaterialCommunityIcons
+                name="robot-outline"
+                size={20}
+                color={Colors.ui.white}
+              />
+            </View>
+            <View style={styles.typingDots}>
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
           </View>
         )}
-        {!isAvailable && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle}>⚠️ Chatbot Unavailable</Text>
-            <Text style={styles.errorMessage}>{loadError}</Text>
-            <Text style={styles.errorSubtext}>
-              Please try refreshing the app or check back later.
-            </Text>
-          </View>
-        )}
-        {isAvailable && (
-          <WebView
-            ref={webViewRef}
-            source={{ html: htmlContent }}
-            style={styles.webview}
-            onLoadStart={() => setIsLoading(true)}
-            onLoadEnd={handleLoadEnd}
-            onMessage={handleWebViewMessage}
-            injectedJavaScript={injectedJavaScript}
-            javaScriptEnabled
-            domStorageEnabled
-            originWhitelist={["*"]}
-            startInLoadingState
-            mixedContentMode="always"
-            onError={handleLoadError}
+
+        {/* Input Area */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Ask me anything..."
+            placeholderTextColor={Colors.ui.textMuted}
+            value={inputText}
+            onChangeText={setInputText}
+            multiline
+            maxLength={500}
           />
-        )}
-      </ThemedView>
+          <Pressable
+            style={[
+              styles.sendButton,
+              !inputText.trim() && styles.sendButtonDisabled,
+            ]}
+            onPress={handleSendMessage}
+            disabled={!inputText.trim() || isLoading}
+          >
+            <MaterialCommunityIcons
+              name="send"
+              size={24}
+              color={Colors.ui.white}
+            />
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  content: { flex: 1 },
-  webview: { flex: 1 },
-  loadingContainer: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    zIndex: 1000,
-  },
-  errorContainer: {
+  container: {
     flex: 1,
+    backgroundColor: Colors.ui.backgroundAlt,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  messagesList: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingTop: 12,
+    flexGrow: 1,
+    justifyContent: "flex-end",
+  },
+  botMessageContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginBottom: 16,
+    gap: 12,
+  },
+  botIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.agribot.primary,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 20,
-    backgroundColor: "#fff",
+    flexShrink: 0,
   },
-  errorTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 12,
-    textAlign: "center",
+  messageBubble: {
+    maxWidth: "80%",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
   },
-  errorMessage: {
-    fontSize: 16,
-    color: "#666",
+  botMessage: {
+    backgroundColor: Colors.ui.cardBackground,
+    shadowColor: Colors.ui.shadowColor,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  userMessageContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginBottom: 16,
-    textAlign: "center",
-    lineHeight: 24,
   },
-  errorSubtext: {
+  userMessage: {
+    backgroundColor: Colors.agribot.primary,
+  },
+  messageText: {
     fontSize: 14,
-    color: "#999",
-    textAlign: "center",
-    fontStyle: "italic",
+    lineHeight: 20,
+    color: Colors.ui.textPrimary,
+    marginBottom: 4,
+  },
+  userMessageText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: Colors.ui.white,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: Colors.ui.textMuted,
+    marginTop: 4,
+  },
+  loadingContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 12,
+  },
+  typingDots: {
+    flexDirection: "row",
+    gap: 4,
+    alignItems: "center",
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.agribot.primary,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 12 : 16,
+    backgroundColor: Colors.ui.background,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    gap: 12,
+    alignItems: "flex-end",
+  },
+  input: {
+    flex: 1,
+    backgroundColor: Colors.ui.backgroundAlt,
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: Colors.ui.textPrimary,
+    maxHeight: 100,
+  },
+  sendButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.agribot.primary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
 });
