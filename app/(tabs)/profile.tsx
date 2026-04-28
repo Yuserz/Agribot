@@ -11,10 +11,46 @@ import {
 } from "react-native";
 
 export default function ProfileScreen() {
-  const handleLogout = () => {
-    // Implement logout logic
-    console.log("Logout pressed");
+  const userProfile = {
+    name: "guest",
+    email: "guest@gmail.com",
+    stats: {
+      chats: 24,
+      topics: 12,
+      days: 7,
+    },
   };
+
+  const menuItems = [
+    {
+      id: "1",
+      icon: "cog",
+      label: "Account Settings",
+      description: "Manage your account preferences",
+      onPress: () => console.log("Account Settings pressed"),
+    },
+    {
+      id: "2",
+      icon: "bell",
+      label: "Notifications",
+      description: "Configure notification preferences",
+      onPress: () => console.log("Notifications pressed"),
+    },
+    {
+      id: "3",
+      icon: "help-circle",
+      label: "Help & Support",
+      description: "Get help and contact support",
+      onPress: () => console.log("Help & Support pressed"),
+    },
+    {
+      id: "4",
+      icon: "shield",
+      label: "Privacy & Security",
+      description: "Manage your privacy settings",
+      onPress: () => console.log("Privacy & Security pressed"),
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,69 +58,59 @@ export default function ProfileScreen() {
         {/* Profile Header */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
-            <MaterialCommunityIcons
-              name="account-circle"
-              size={80}
-              color={Colors.agribot.primary}
-            />
+            <View style={styles.avatarCircle}>
+              <MaterialCommunityIcons
+                name="account"
+                size={60}
+                color={Colors.agribot.primary}
+              />
+            </View>
           </View>
-          <Text style={styles.profileName}>Guest User</Text>
-          <Text style={styles.profileEmail}>Welcome to AgriBot</Text>
+          <Text style={styles.profileName}>{userProfile.name}</Text>
+          <Text style={styles.profileEmail}>{userProfile.email}</Text>
         </View>
 
-        {/* Profile Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Farm Size (acres)</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Questions Asked</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>0</Text>
-            <Text style={styles.statLabel}>Tips Saved</Text>
+        {/* Your Activity Section */}
+        <View style={styles.activityContainer}>
+          <Text style={styles.activityTitle}>Your Activity</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{userProfile.stats.chats}</Text>
+              <Text style={styles.statLabel}>Chats</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{userProfile.stats.topics}</Text>
+              <Text style={styles.statLabel}>Topics</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{userProfile.stats.days}</Text>
+              <Text style={styles.statLabel}>Days</Text>
+            </View>
           </View>
         </View>
 
         {/* Menu Items */}
         <View style={styles.menuContainer}>
-          <MenuItem
-            icon="cog"
-            label="Settings"
-            onPress={() => console.log("Settings pressed")}
-          />
-          <MenuItem
-            icon="bookmark-outline"
-            label="Saved Tips"
-            onPress={() => console.log("Saved Tips pressed")}
-          />
-          <MenuItem
-            icon="help-circle-outline"
-            label="Help & Support"
-            onPress={() => console.log("Help pressed")}
-          />
-          <MenuItem
-            icon="information-outline"
-            label="About AgriBot"
-            onPress={() => console.log("About pressed")}
-          />
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.id}
+              icon={item.icon}
+              label={item.label}
+              description={item.description}
+              onPress={item.onPress}
+            />
+          ))}
         </View>
 
-        {/* Logout Button */}
-        <Pressable style={styles.logoutButton} onPress={handleLogout}>
-          <MaterialCommunityIcons
-            name="logout"
-            size={20}
-            color={Colors.ui.white}
-            style={styles.logoutIcon}
-          />
-          <Text style={styles.logoutText}>Logout</Text>
-        </Pressable>
-
-        <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>AgriBot v1.0.0</Text>
+        {/* About AgriBot */}
+        <View style={styles.aboutContainer}>
+          <Text style={styles.aboutTitle}>About AgriBot</Text>
+          <View style={styles.aboutContent}>
+            <Text style={styles.aboutLabel}>Version</Text>
+            <Text style={styles.aboutValue}>1.0.0</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -94,10 +120,11 @@ export default function ProfileScreen() {
 interface MenuItemProps {
   icon: string;
   label: string;
+  description: string;
   onPress: () => void;
 }
 
-function MenuItem({ icon, label, onPress }: MenuItemProps) {
+function MenuItem({ icon, label, description, onPress }: MenuItemProps) {
   return (
     <Pressable
       style={({ pressed }) => [
@@ -106,13 +133,17 @@ function MenuItem({ icon, label, onPress }: MenuItemProps) {
       ]}
       onPress={onPress}
     >
-      <MaterialCommunityIcons
-        name={icon as any}
-        size={24}
-        color={Colors.agribot.primary}
-        style={styles.menuIcon}
-      />
-      <Text style={styles.menuLabel}>{label}</Text>
+      <View style={styles.iconBackground}>
+        <MaterialCommunityIcons
+          name={icon as any}
+          size={24}
+          color={Colors.agribot.primary}
+        />
+      </View>
+      <View style={styles.menuItemContent}>
+        <Text style={styles.menuLabel}>{label}</Text>
+        <Text style={styles.menuDescription}>{description}</Text>
+      </View>
       <MaterialCommunityIcons
         name="chevron-right"
         size={24}
@@ -125,53 +156,83 @@ function MenuItem({ icon, label, onPress }: MenuItemProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.ui.background,
+    backgroundColor: Colors.ui.backgroundAlt,
   },
   profileHeader: {
     alignItems: "center",
     paddingVertical: 32,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    paddingBottom: 40,
+    backgroundColor: Colors.agribot.primary,
   },
   avatarContainer: {
     marginBottom: 16,
   },
+  avatarCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.ui.white,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   profileName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "700",
-    color: Colors.ui.textPrimary,
+    color: Colors.ui.white,
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: Colors.ui.textSecondary,
+    color: "rgba(255, 255, 255, 0.9)",
   },
-  statsContainer: {
+  activityContainer: {
+    marginHorizontal: 16,
+    marginTop: -30,
+    marginBottom: 24,
+    backgroundColor: Colors.ui.cardBackground,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: Colors.ui.shadowColor,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  activityTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.ui.textPrimary,
+    marginBottom: 16,
+  },
+  statsRow: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingHorizontal: 16,
-    paddingVertical: 24,
-    backgroundColor: "rgba(29, 184, 84, 0.05)",
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 12,
+    alignItems: "center",
   },
   statItem: {
     alignItems: "center",
+    flex: 1,
   },
   statValue: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "800",
     color: Colors.agribot.primary,
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: Colors.ui.textSecondary,
+    fontWeight: "500",
+  },
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    marginHorizontal: 12,
   },
   menuContainer: {
-    marginTop: 24,
     marginHorizontal: 16,
+    marginBottom: 24,
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: 12,
     overflow: "hidden",
@@ -192,41 +253,59 @@ const styles = StyleSheet.create({
   menuItemPressed: {
     backgroundColor: "rgba(29, 184, 84, 0.05)",
   },
-  menuIcon: {
-    marginRight: 12,
+  iconBackground: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: "rgba(29, 184, 84, 0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  menuItemContent: {
+    flex: 1,
   },
   menuLabel: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "500",
-    color: Colors.ui.textPrimary,
-  },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginHorizontal: 16,
-    marginTop: 24,
-    marginBottom: 32,
-    paddingVertical: 14,
-    backgroundColor: "#d32f2f",
-    borderRadius: 12,
-  },
-  logoutIcon: {
-    marginRight: 8,
-  },
-  logoutText: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.ui.white,
+    color: Colors.ui.textPrimary,
+    marginBottom: 2,
   },
-  versionContainer: {
-    alignItems: "center",
+  menuDescription: {
+    fontSize: 13,
+    color: Colors.ui.textSecondary,
+  },
+  aboutContainer: {
+    marginHorizontal: 16,
+    marginBottom: 32,
+    backgroundColor: Colors.ui.cardBackground,
+    borderRadius: 12,
+    paddingHorizontal: 16,
     paddingVertical: 16,
-    marginBottom: 16,
+    shadowColor: Colors.ui.shadowColor,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  versionText: {
-    fontSize: 12,
-    color: Colors.ui.textMuted,
+  aboutTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: Colors.ui.textPrimary,
+    marginBottom: 12,
+  },
+  aboutContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  aboutLabel: {
+    fontSize: 14,
+    color: Colors.ui.textSecondary,
+  },
+  aboutValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: Colors.agribot.primary,
   },
 });
