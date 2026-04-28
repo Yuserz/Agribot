@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const quickActions = [
@@ -68,94 +69,102 @@ export default function HomeScreen() {
   ];
 
   return (
-    <ScrollView
+    <SafeAreaView
       style={[styles.container, { backgroundColor: Colors.ui.background }]}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={false}
+      edges={["top", "left", "right"]}
     >
-      {/* Green Header Section */}
-      <View style={styles.headerSection}>
-        <Text style={styles.greeting}>Hello, guest! 👋</Text>
-        <Text style={styles.subGreeting}>How can I help you today?</Text>
-      </View>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Green Header Section */}
+        <View style={styles.headerSection}>
+          <Text style={styles.greeting}>Hello, guest! 👋</Text>
+          <Text style={styles.subGreeting}>How can I help you today?</Text>
+        </View>
 
-      {/* Quick Actions Card */}
-      <View style={[styles.card, styles.quickActionsCard]}>
-        <Text style={styles.cardTitle}>Quick Actions</Text>
-        <View style={styles.actionsGrid}>
-          {quickActions.map((action) => (
-            <TouchableOpacity key={action.id} style={styles.actionItem}>
+        {/* Quick Actions Card */}
+        <View style={[styles.card, styles.quickActionsCard]}>
+          <Text style={styles.cardTitle}>Quick Actions</Text>
+          <View style={styles.actionsGrid}>
+            {quickActions.map((action) => (
+              <TouchableOpacity key={action.id} style={styles.actionItem}>
+                <View
+                  style={[
+                    styles.actionIconBg,
+                    { backgroundColor: action.bgColor },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    name={action.icon as any}
+                    size={32}
+                    color={action.iconColor}
+                  />
+                </View>
+                <Text
+                  style={[styles.actionLabel, { color: Colors.ui.textPrimary }]}
+                >
+                  {action.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Today's Tips Section */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: Colors.ui.textPrimary }]}>
+            Today&apos;s Tips
+          </Text>
+          {tips.map((tip) => (
+            <View
+              key={tip.id}
+              style={[
+                styles.tipCard,
+                { backgroundColor: Colors.ui.cardBackground },
+              ]}
+            >
               <View
-                style={[
-                  styles.actionIconBg,
-                  { backgroundColor: action.bgColor },
-                ]}
+                style={[styles.tipIconBg, { backgroundColor: tip.bgColor }]}
               >
                 <MaterialCommunityIcons
-                  name={action.icon as any}
-                  size={32}
-                  color={action.iconColor}
+                  name={tip.icon as any}
+                  size={28}
+                  color={tip.iconColor}
                 />
               </View>
-              <Text
-                style={[styles.actionLabel, { color: Colors.ui.textPrimary }]}
-              >
-                {action.label}
-              </Text>
-            </TouchableOpacity>
+              <View style={styles.tipContent}>
+                <Text
+                  style={[styles.tipTitle, { color: Colors.ui.textPrimary }]}
+                >
+                  {tip.title}
+                </Text>
+                <Text
+                  style={[
+                    styles.tipDescription,
+                    { color: Colors.ui.textSecondary },
+                  ]}
+                >
+                  {tip.description}
+                </Text>
+              </View>
+            </View>
           ))}
         </View>
-      </View>
 
-      {/* Today's Tips Section */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: Colors.ui.textPrimary }]}>
-          Today&apos;s Tips
-        </Text>
-        {tips.map((tip) => (
-          <View
-            key={tip.id}
-            style={[
-              styles.tipCard,
-              { backgroundColor: Colors.ui.cardBackground },
-            ]}
-          >
-            <View style={[styles.tipIconBg, { backgroundColor: tip.bgColor }]}>
-              <MaterialCommunityIcons
-                name={tip.icon as any}
-                size={28}
-                color={tip.iconColor}
-              />
-            </View>
-            <View style={styles.tipContent}>
-              <Text style={[styles.tipTitle, { color: Colors.ui.textPrimary }]}>
-                {tip.title}
-              </Text>
-              <Text
-                style={[
-                  styles.tipDescription,
-                  { color: Colors.ui.textSecondary },
-                ]}
-              >
-                {tip.description}
-              </Text>
-            </View>
+        {/* Your Progress Section */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressHeader}>
+            <MaterialCommunityIcons
+              name="trending-up"
+              size={24}
+              color={Colors.ui.white}
+            />
+            <Text style={styles.progressTitle}>Your Progress</Text>
           </View>
-        ))}
-      </View>
-
-      {/* Your Progress Section */}
-      <View style={styles.progressSection}>
-        <View style={styles.progressHeader}>
-          <MaterialCommunityIcons
-            name="trending-up"
-            size={24}
-            color={Colors.ui.white}
-          />
-          <Text style={styles.progressTitle}>Your Progress</Text>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -164,7 +173,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   headerSection: {
     backgroundColor: Colors.agribot.primary,

@@ -4,12 +4,12 @@ import React, { useMemo, useState } from "react";
 import {
   FlatList,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FAQItem {
   id: string;
@@ -155,7 +155,10 @@ export default function FAQScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <View style={styles.headerSection}>
         <Text style={styles.headerTitle}>Frequently Asked Questions</Text>
         <View style={styles.searchBar}>
@@ -222,6 +225,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingVertical: 16,
+    paddingBottom: 80,
   },
   categorySection: {
     marginBottom: 24,
