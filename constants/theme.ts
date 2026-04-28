@@ -31,6 +31,37 @@ export const Colors = {
     light: "#1DB854",
     dark: "#16a043",
   },
+  ui: {
+    // General UI colors
+    white: "#ffffff",
+    textPrimary: "#1a1a1a",
+    textSecondary: "#666666",
+    textMuted: "#aaaaaa",
+    background: "#ffffff",
+    backgroundAlt: "#f5f5f5",
+    shadowColor: "#000000",
+
+    // Card colors
+    cardBackground: "#ffffff",
+
+    // Quick Actions icon colors
+    plantingIcon: "#2e7d32",
+    wateringIcon: "#1976d2",
+    pestsIcon: "#d32f2f",
+    pruningIcon: "#7b1fa2",
+
+    // Quick Actions backgrounds
+    plantingBg: "#C8E6C9",
+    wateringBg: "#B3E5FC",
+    pestsBg: "#FFCCBC",
+    pruningBg: "#E1BEE7",
+
+    // Tips backgrounds
+    tipBgYellow: "#FFF9C4",
+    tipBgBlue: "#B3E5FC",
+    tipBgGreen: "#C8E6C9",
+    tipIconColor: "#424242",
+  },
 };
 
 export const Fonts = Platform.select({
