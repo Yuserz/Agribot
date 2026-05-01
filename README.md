@@ -1,13 +1,36 @@
-# Welcome to your Expo app 👋
+# AgriBot 🤖🌾
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+AgriBot is a mobile application built with [Expo](https://expo.dev) that provides intelligent agricultural solutions and assistance about Dragon Fruit Farming. This app leverages modern technology to help farmers and agricultural professionals with real-time chatbot support, frequently asked questions, user authentication, and comprehensive profile management.
+
+## About AgriBot
+
+AgriBot is designed to bridge the gap between technology and agriculture by offering:
+
+- **AI-powered Chatbot**: Get instant answers to your agricultural queries
+- **Frequently Asked Questions (FAQ)**: Quick access to common agricultural knowledge
+- **User Authentication**: Secure login and signup functionality
+- **User Profiles**: Manage your account and preferences
+
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app), providing a cross-platform experience for Android, iOS, and web.
+
+## Prerequisites
+
+Before running this app, ensure you have the following installed:
+
+### Required
+
+- **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
+- **pnpm** (v8 or higher) - Install globally using:
+  ```bash
+  npm install -g pnpm
+  ```
 
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the app
@@ -24,16 +47,6 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
 ## Learn more
 
