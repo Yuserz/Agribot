@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useMemo, useState } from "react";
 import {
   FlatList,
@@ -157,9 +158,14 @@ export default function FAQScreen() {
   return (
     <SafeAreaView
       style={styles.container}
-      edges={["top", "left", "right", "bottom"]}
+      edges={["top", "left", "right"]}
     >
-      <View style={styles.headerSection}>
+      <LinearGradient
+        colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerSection}
+      >
         <Text style={styles.headerTitle}>Frequently Asked Questions</Text>
         <View style={styles.searchBar}>
           <MaterialCommunityIcons
@@ -176,7 +182,7 @@ export default function FAQScreen() {
             onChangeText={setSearchQuery}
           />
         </View>
-      </View>
+      </LinearGradient>
 
       <FlatList
         data={filteredAndGroupedData}
@@ -195,7 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.ui.backgroundAlt,
   },
   headerSection: {
-    backgroundColor: Colors.agribot.primary,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 20,

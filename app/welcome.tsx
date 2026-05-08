@@ -1,8 +1,8 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Circle, Path } from "react-native-svg";
 
 import { Colors } from "@/constants/theme";
 
@@ -50,24 +50,11 @@ export default function WelcomeScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoBox}>
-            <Svg width={100} height={100} viewBox="0 0 100 100">
-              <Circle cx="50" cy="50" r="45" fill={Colors.agribot.primary} />
-              <Path
-                d="M 50 30 Q 65 35 68 55 Q 68 72 50 75 Q 32 72 32 55 Q 35 35 50 30"
-                fill="none"
-                stroke="white"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <Path
-                d="M 50 30 Q 50 50 50 75"
-                fill="none"
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            </Svg>
+            <Image
+              source={require("@/assets/images/logo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
         </View>
 
@@ -83,9 +70,14 @@ export default function WelcomeScreen() {
         <View style={styles.featuresContainer}>
           {features.map((feature) => (
             <View key={feature.id} style={styles.featureItem}>
-              <View style={styles.featureNumber}>
+              <LinearGradient
+                colors={["#25d366", Colors.agribot.primary]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.featureNumber}
+              >
                 <Text style={styles.featureNumberText}>{feature.id}</Text>
-              </View>
+              </LinearGradient>
               <View style={styles.featureContent}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
                 <Text style={styles.featureDescription}>
@@ -99,14 +91,18 @@ export default function WelcomeScreen() {
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
           <Pressable
-            style={({ pressed }) => [
-              styles.primaryButton,
-              { opacity: pressed ? 0.85 : 1 },
-            ]}
+            style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
             onPress={handleGetStarted}
           >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
-            <Text style={styles.arrowIcon}>→</Text>
+            <LinearGradient
+              colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryButton}
+            >
+              <Text style={styles.primaryButtonText}>Get Started</Text>
+              <Text style={styles.arrowIcon}>→</Text>
+            </LinearGradient>
           </Pressable>
 
           <Pressable
@@ -149,9 +145,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  logoImage: {
+    width: 100,
+    height: 100,
   },
   title: {
     fontSize: 32,
@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#E8F5E9",
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
@@ -190,7 +189,7 @@ const styles = StyleSheet.create({
   featureNumberText: {
     fontSize: 20,
     fontWeight: "700",
-    color: Colors.agribot.primary,
+    color: "white",
   },
   featureContent: {
     flex: 1,
@@ -212,7 +211,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: Colors.agribot.primary,
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
@@ -222,7 +220,7 @@ const styles = StyleSheet.create({
     gap: 8,
     shadowColor: Colors.agribot.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
@@ -243,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.agribot.primary,
   },
   secondaryButtonText: {

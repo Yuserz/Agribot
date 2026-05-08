@@ -1,7 +1,10 @@
 import { Colors } from "@/constants/theme";
+import { ChatMessage, useBotpress } from "@/context/botpress";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useRef } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -13,71 +16,54 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-interface Message {
-  id: string;
-  text: string;
-  sender: "bot" | "user";
-  timestamp: Date;
-}
-
 export default function ChatbotScreen() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: "Hello! I'm AgriBot, your dragon fruit farming assistant. How can I help you today? 🌱",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
-  const [inputText, setInputText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    messages,
+    isLoading,
+    isInitializing,
+    sendMessage,
+    pendingMessage,
+    clearPendingMessage,
+  } = useBotpress();
+
+  const [inputText, setInputText] = React.useState("");
   const flatListRef = useRef<FlatList>(null);
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
+  // Auto-send pending message set by quick actions
+  useFocusEffect(
+    useCallback(() => {
+      if (pendingMessage && !isInitializing && !isLoading) {
+        const msg = pendingMessage;
+        clearPendingMessage();
+        sendMessage(msg);
+      }
+    }, [pendingMessage, isInitializing, isLoading, sendMessage, clearPendingMessage]),
+  );
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+  }, []);
+
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isLoading || isInitializing) return;
+    setInputText("");
+    scrollToBottom();
+    await sendMessage(text.trim());
+    scrollToBottom();
+  };
+
+  const handleSendMessage = () => handleSend(inputText);
+  const handleChoiceSelect = (value: string) => handleSend(value);
+
+  const formatTime = (date: Date) =>
+    date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
-  };
 
-  const handleSendMessage = async () => {
-    if (inputText.trim() === "") return;
-
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputText("");
-    setIsLoading(true);
-
-    // Simulate bot response delay
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: "Thank you for your question! I'm here to help with your dragon fruit farming needs. This is a placeholder response. 🌿",
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-      setIsLoading(false);
-    }, 800);
-
-    // Scroll to bottom
-    setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-  };
-
-  const renderMessage = ({ item }: { item: Message }) => {
-    const isBot = item.sender === "bot";
-
-    if (isBot) {
+  const renderMessage = ({ item }: { item: ChatMessage }) => {
+    if (item.sender === "bot") {
       return (
         <View style={styles.botMessageContainer}>
           <View style={styles.botIconContainer}>
@@ -87,9 +73,28 @@ export default function ChatbotScreen() {
               color={Colors.ui.white}
             />
           </View>
-          <View style={[styles.messageBubble, styles.botMessage]}>
-            <Text style={styles.messageText}>{item.text}</Text>
-            <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+          <View style={styles.botBubbleWrapper}>
+            <View style={[styles.messageBubble, styles.botMessage]}>
+              <Text style={styles.messageText}>{item.text}</Text>
+              <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+            </View>
+            {item.choices && item.choices.length > 0 && (
+              <View style={styles.choicesContainer}>
+                {item.choices.map((choice) => (
+                  <Pressable
+                    key={choice.value}
+                    style={({ pressed }) => [
+                      styles.choiceButton,
+                      pressed && styles.choiceButtonPressed,
+                    ]}
+                    onPress={() => handleChoiceSelect(choice.value)}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.choiceButtonText}>{choice.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       );
@@ -104,6 +109,15 @@ export default function ChatbotScreen() {
     );
   };
 
+  if (isInitializing) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color={Colors.agribot.primary} />
+        <Text style={styles.connectingText}>Connecting to AgriBot...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
@@ -117,9 +131,7 @@ export default function ChatbotScreen() {
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesList}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
+          onContentSizeChange={scrollToBottom}
         />
 
         {isLoading && (
@@ -139,7 +151,6 @@ export default function ChatbotScreen() {
           </View>
         )}
 
-        {/* Input Area */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -149,11 +160,12 @@ export default function ChatbotScreen() {
             onChangeText={setInputText}
             multiline
             maxLength={500}
+            editable={!isLoading && !isInitializing}
           />
           <Pressable
             style={[
               styles.sendButton,
-              !inputText.trim() && styles.sendButtonDisabled,
+              (!inputText.trim() || isLoading) && styles.sendButtonDisabled,
             ]}
             onPress={handleSendMessage}
             disabled={!inputText.trim() || isLoading}
@@ -175,6 +187,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.ui.backgroundAlt,
   },
+  centerContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 16,
+  },
   keyboardAvoidingView: {
     flex: 1,
     flexDirection: "column",
@@ -190,9 +207,12 @@ const styles = StyleSheet.create({
   },
   botMessageContainer: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     marginBottom: 16,
     gap: 12,
+  },
+  botBubbleWrapper: {
+    flex: 1,
   },
   botIconContainer: {
     width: 40,
@@ -202,9 +222,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
+    marginTop: 2,
   },
   messageBubble: {
-    maxWidth: "80%",
+    maxWidth: "100%",
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
@@ -224,6 +245,7 @@ const styles = StyleSheet.create({
   },
   userMessage: {
     backgroundColor: Colors.agribot.primary,
+    maxWidth: "80%",
   },
   messageText: {
     fontSize: 14,
@@ -240,6 +262,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.ui.textMuted,
     marginTop: 4,
+  },
+  choicesContainer: {
+    marginTop: 8,
+    gap: 8,
+  },
+  choiceButton: {
+    borderWidth: 1.5,
+    borderColor: Colors.agribot.primary,
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+  },
+  choiceButtonPressed: {
+    backgroundColor: "rgba(29, 184, 84, 0.1)",
+  },
+  choiceButtonText: {
+    fontSize: 14,
+    color: Colors.agribot.primary,
+    fontWeight: "500",
   },
   loadingContainer: {
     paddingHorizontal: 16,
@@ -263,7 +305,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // paddingBottom: Platform.OS === "ios" ? 12 : 16,
     backgroundColor: Colors.ui.background,
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
@@ -290,5 +331,10 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+  connectingText: {
+    fontSize: 14,
+    color: Colors.ui.textSecondary,
+    marginTop: 8,
   },
 });

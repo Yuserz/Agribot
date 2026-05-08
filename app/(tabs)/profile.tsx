@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/context/auth";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -25,42 +26,47 @@ export default function ProfileScreen() {
       icon: "cog",
       label: "Account Settings",
       description: "Manage your account preferences",
-      onPress: () => console.log("Account Settings pressed"),
+      onPress: () => {},
     },
     {
       id: "2",
       icon: "bell",
       label: "Notifications",
       description: "Configure notification preferences",
-      onPress: () => console.log("Notifications pressed"),
+      onPress: () => {},
     },
     {
       id: "3",
       icon: "help-circle",
       label: "Help & Support",
       description: "Get help and contact support",
-      onPress: () => console.log("Help & Support pressed"),
+      onPress: () => {},
     },
     {
       id: "4",
       icon: "shield",
       label: "Privacy & Security",
       description: "Manage your privacy settings",
-      onPress: () => console.log("Privacy & Security pressed"),
+      onPress: () => {},
     },
   ];
 
   return (
     <SafeAreaView
       style={styles.container}
-      edges={["top", "left", "right", "bottom"]}
+      edges={["top", "left", "right"]}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Profile Header */}
-        <View style={styles.profileHeader}>
+        <LinearGradient
+          colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.profileHeader}
+        >
           <View style={styles.avatarContainer}>
             <View style={styles.avatarCircle}>
               <MaterialCommunityIcons
@@ -72,28 +78,7 @@ export default function ProfileScreen() {
           </View>
           <Text style={styles.profileName}>{displayName}</Text>
           <Text style={styles.profileEmail}>{displayEmail}</Text>
-        </View>
-
-        {/* Your Activity Section */}
-        <View style={styles.activityContainer}>
-          <Text style={styles.activityTitle}>Your Activity</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{userProfile.stats.chats}</Text>
-              <Text style={styles.statLabel}>Chats</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{userProfile.stats.topics}</Text>
-              <Text style={styles.statLabel}>Topics</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{userProfile.stats.days}</Text>
-              <Text style={styles.statLabel}>Days</Text>
-            </View>
-          </View>
-        </View>
+        </LinearGradient>
 
         {/* Menu Items */}
         <View style={styles.menuContainer}>
@@ -116,18 +101,19 @@ export default function ProfileScreen() {
             <Text style={styles.aboutValue}>1.0.0</Text>
           </View>
         </View>
-
-        {/* Logout Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.logoutButton,
-            { opacity: pressed ? 0.8 : 1 },
-          ]}
-          onPress={handleLogout}
-        >
-          <MaterialCommunityIcons name="logout" size={20} color="#e53e3e" />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </Pressable>
+        {/* Logout — pinned to bottom */}
+        <View style={styles.logoutWrapper}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.logoutButton,
+              { opacity: pressed ? 0.8 : 1 },
+            ]}
+            onPress={handleLogout}
+          >
+            <MaterialCommunityIcons name="logout" size={20} color="#e53e3e" />
+            <Text style={styles.logoutText}>Log Out</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -174,11 +160,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.ui.backgroundAlt,
   },
+  scrollContent: {
+    paddingBottom: 24,
+  },
   profileHeader: {
     alignItems: "center",
     paddingVertical: 32,
     paddingBottom: 40,
-    backgroundColor: Colors.agribot.primary,
+    marginBottom: 24,
   },
   avatarContainer: {
     marginBottom: 16,
@@ -200,51 +189,6 @@ const styles = StyleSheet.create({
   profileEmail: {
     fontSize: 14,
     color: "rgba(255, 255, 255, 0.9)",
-  },
-  activityContainer: {
-    marginHorizontal: 16,
-    marginTop: -30,
-    marginBottom: 24,
-    backgroundColor: Colors.ui.cardBackground,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: Colors.ui.shadowColor,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  activityTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Colors.ui.textPrimary,
-    marginBottom: 16,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  statItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-  statValue: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: Colors.agribot.primary,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 13,
-    color: Colors.ui.textSecondary,
-    fontWeight: "500",
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    marginHorizontal: 12,
   },
   menuContainer: {
     marginHorizontal: 16,
@@ -293,7 +237,7 @@ const styles = StyleSheet.create({
   },
   aboutContainer: {
     marginHorizontal: 16,
-    marginBottom: 32,
+    marginBottom: 8,
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: 12,
     paddingHorizontal: 16,
@@ -324,15 +268,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.agribot.primary,
   },
-  scrollContent: {
-    paddingBottom: 80,
+  logoutWrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    backgroundColor: Colors.ui.backgroundAlt,
   },
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 16,
-    marginBottom: 32,
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1.5,

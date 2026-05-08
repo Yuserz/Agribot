@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -230,18 +231,22 @@ export default function SignUpScreen() {
 
         {/* Sign Up Button */}
         <Pressable
-          style={({ pressed }) => [
-            styles.signUpButton,
-            { opacity: pressed || loading ? 0.85 : 1 },
-          ]}
+          style={({ pressed }) => [{ opacity: pressed || loading ? 0.85 : 1 }]}
           onPress={handleSignUp}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.signUpButtonText}>Sign Up</Text>
-          )}
+          <LinearGradient
+            colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.signUpButton}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.signUpButtonText}>Sign Up</Text>
+            )}
+          </LinearGradient>
         </Pressable>
 
         {/* Login Link */}
@@ -350,7 +355,6 @@ const styles = StyleSheet.create({
     color: Colors.agribot.primary,
   },
   signUpButton: {
-    backgroundColor: Colors.agribot.primary,
     paddingVertical: 16,
     borderRadius: 12,
     justifyContent: "center",
@@ -358,7 +362,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     shadowColor: Colors.agribot.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },

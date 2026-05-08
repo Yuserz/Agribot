@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useState } from "react";
-import { Animated, Easing, StyleSheet, Text, View } from "react-native";
-import Svg, { Path } from "react-native-svg";
+import { Animated, Easing, Image, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import { useAuth } from "@/context/auth";
@@ -75,61 +75,43 @@ export default function SplashScreen() {
   }, [loading, session]);
 
   return (
-    <View style={styles.container}>
-      {/* Content */}
+    <LinearGradient
+      colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
       <View style={styles.content}>
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoBox}>
-            <Svg width={80} height={80} viewBox="0 0 100 100">
-              {/* Leaf icon */}
-              <Path
-                d="M 50 20 Q 70 30 75 55 Q 75 80 50 85 Q 25 80 25 55 Q 30 30 50 20"
-                fill="none"
-                stroke={Colors.agribot.primary}
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Leaf vein */}
-              <Path
-                d="M 50 20 Q 50 50 50 85"
-                fill="none"
-                stroke={Colors.agribot.primary}
-                strokeWidth="5"
-                strokeLinecap="round"
-              />
-            </Svg>
+            <Image
+              source={require("@/assets/images/logo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
           </View>
         </View>
 
-        {/* Title and Subtitle */}
         <Text style={styles.title}>AgriBot</Text>
         <Text style={styles.subtitle}>Dragon Fruit Farming Assistant</Text>
 
-        {/* Loading Animation - Three Dots */}
         <View style={styles.dotsContainer}>
           {dotOpacity.map((opacity, index) => (
             <Animated.View
               key={index}
-              style={[
-                styles.dot,
-                {
-                  opacity: opacity,
-                },
-              ]}
+              style={[styles.dot, { opacity }]}
             />
           ))}
         </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.agribot.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -145,17 +127,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoBox: {
-    width: 100,
-    height: 100,
+    width: 110,
+    height: 110,
     backgroundColor: "white",
-    borderRadius: 24,
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   title: {
     fontSize: 56,

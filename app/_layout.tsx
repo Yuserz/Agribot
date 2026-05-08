@@ -9,6 +9,7 @@ import React from "react";
 import "react-native-reanimated";
 
 import { AuthProvider } from "@/context/auth";
+import { BotpressProvider } from "@/context/botpress";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export const unstable_settings = {
@@ -20,6 +21,7 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
+      <BotpressProvider>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
           <Stack.Screen name="splash" options={{ headerShown: false }} />
@@ -33,6 +35,7 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
+      </BotpressProvider>
     </AuthProvider>
   );
 }

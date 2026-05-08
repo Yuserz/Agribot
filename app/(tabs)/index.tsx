@@ -1,5 +1,9 @@
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
+import { useBotpress } from "@/context/botpress";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import {
   ScrollView,
   StyleSheet,
@@ -10,6 +14,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
+  const { user } = useAuth();
+  const { setPendingMessage } = useBotpress();
+  const router = useRouter();
+  const displayName =
+    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "guest";
+
   const quickActions = [
     {
       id: 1,
@@ -17,6 +27,7 @@ export default function HomeScreen() {
       icon: "leaf",
       bgColor: Colors.ui.plantingBg,
       iconColor: Colors.ui.plantingIcon,
+      message: "I need help with planting dragon fruit. What should I know?",
     },
     {
       id: 2,
@@ -24,6 +35,7 @@ export default function HomeScreen() {
       icon: "water",
       bgColor: Colors.ui.wateringBg,
       iconColor: Colors.ui.wateringIcon,
+      message: "Can you guide me on watering schedules for dragon fruit?",
     },
     {
       id: 3,
@@ -31,6 +43,7 @@ export default function HomeScreen() {
       icon: "bug",
       bgColor: Colors.ui.pestsBg,
       iconColor: Colors.ui.pestsIcon,
+      message: "How do I deal with pests and diseases in dragon fruit farming?",
     },
     {
       id: 4,
@@ -38,8 +51,14 @@ export default function HomeScreen() {
       icon: "scissors-cutting",
       bgColor: Colors.ui.pruningBg,
       iconColor: Colors.ui.pruningIcon,
+      message: "What is the proper way to prune dragon fruit plants?",
     },
   ];
+
+  const handleQuickAction = (message: string) => {
+    setPendingMessage(message);
+    router.push("/(tabs)/chatbot");
+  };
 
   const tips = [
     {
@@ -78,17 +97,22 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Green Header Section */}
-        <View style={styles.headerSection}>
-          <Text style={styles.greeting}>Hello, guest! 👋</Text>
+        <LinearGradient
+          colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerSection}
+        >
+          <Text style={styles.greeting}>Hello, {displayName}! 👋</Text>
           <Text style={styles.subGreeting}>How can I help you today?</Text>
-        </View>
+        </LinearGradient>
 
         {/* Quick Actions Card */}
         <View style={[styles.card, styles.quickActionsCard]}>
           <Text style={styles.cardTitle}>Quick Actions</Text>
           <View style={styles.actionsGrid}>
             {quickActions.map((action) => (
-              <TouchableOpacity key={action.id} style={styles.actionItem}>
+              <TouchableOpacity key={action.id} style={styles.actionItem} onPress={() => handleQuickAction(action.message)}>
                 <View
                   style={[
                     styles.actionIconBg,
@@ -151,18 +175,6 @@ export default function HomeScreen() {
             </View>
           ))}
         </View>
-
-        {/* Your Progress Section */}
-        <View style={styles.progressSection}>
-          <View style={styles.progressHeader}>
-            <MaterialCommunityIcons
-              name="trending-up"
-              size={24}
-              color={Colors.ui.white}
-            />
-            <Text style={styles.progressTitle}>Your Progress</Text>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -173,10 +185,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: 100,
+    paddingBottom: 0,
   },
   headerSection: {
-    backgroundColor: Colors.agribot.primary,
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 32,
@@ -280,24 +291,5 @@ const styles = StyleSheet.create({
   tipDescription: {
     fontSize: 13,
     lineHeight: 18,
-  },
-  progressSection: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 24,
-    backgroundColor: Colors.agribot.primary,
-    borderRadius: 16,
-    padding: 20,
-    paddingVertical: 40,
-  },
-  progressHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  progressTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Colors.ui.white,
   },
 });
