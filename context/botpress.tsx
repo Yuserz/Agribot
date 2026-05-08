@@ -4,6 +4,7 @@ import {
   getMessages,
   initSession,
   pollForBotReply,
+  resetConversation,
   sendMessage as apiSendMessage,
 } from "@/utils/botpress";
 import React, {
@@ -32,6 +33,7 @@ type BotpressContextType = {
   pendingMessage: string;
   setPendingMessage: (text: string) => void;
   clearPendingMessage: () => void;
+  startNewConversation: () => void;
 };
 
 const BotpressContext = createContext<BotpressContextType>({
@@ -42,6 +44,7 @@ const BotpressContext = createContext<BotpressContextType>({
   pendingMessage: "",
   setPendingMessage: () => {},
   clearPendingMessage: () => {},
+  startNewConversation: () => {},
 });
 
 function toChatMessage(msg: BotpressMessage, userId: string): ChatMessage {
@@ -61,6 +64,7 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [pendingMessage, setPendingMessage] = useState("");
+  const [sessionKey, setSessionKey] = useState(0);
   const sessionRef = useRef<BotpressSession | null>(null);
 
   const doSend = useCallback(
@@ -122,14 +126,21 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
         const history = await getMessages(session);
         if (cancelled) return;
 
-        if (history.length > 0) {
-          setMessages(history.map((m) => toChatMessage(m, session.userId)));
+        // Strip the silent "hi" init ping from history so it never appears in the UI
+        const visible = history.filter((m, i) => {
+          if (m.userId !== session.userId) return true;
+          const text = m.payload.type === "text" ? m.payload.text : "";
+          const isFirstUserMsg = !history.slice(0, i).some((p) => p.userId === session.userId);
+          return !(isFirstUserMsg && text.toLowerCase() === "hi");
+        });
+
+        if (visible.length > 0) {
+          setMessages(visible.map((m) => toChatMessage(m, session.userId)));
         } else {
-          // Fresh conversation — ping the bot silently to get the welcome message
           await doSend(session, "hi", false);
         }
       } catch {
-        // Session init failed silently; chatbot screen will show its retry UI
+        // Session init failed silently
       } finally {
         if (!cancelled) setIsInitializing(false);
       }
@@ -138,7 +149,7 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [user, doSend]);
+  }, [user, doSend, sessionKey]);
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -150,6 +161,14 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
 
   const clearPendingMessage = useCallback(() => setPendingMessage(""), []);
 
+  const startNewConversation = useCallback(() => {
+    sessionRef.current = null;
+    resetConversation().then(() => {
+      setMessages([]);
+      setSessionKey((k) => k + 1);
+    });
+  }, []);
+
   return (
     <BotpressContext.Provider
       value={{
@@ -160,6 +179,7 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
         pendingMessage,
         setPendingMessage,
         clearPendingMessage,
+        startNewConversation,
       }}
     >
       {children}

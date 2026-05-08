@@ -2,10 +2,14 @@ import { Colors } from "@/constants/theme";
 import { ChatMessage, useBotpress } from "@/context/botpress";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
-import React, { useCallback, useRef } from "react";
+import * as Speech from "expo-speech";
+import Markdown from "react-native-markdown-display";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,7 +18,57 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeInLeft,
+  FadeInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// Pulsing dots shown while bot is typing
+function TypingDots() {
+  const dot1 = useSharedValue(0.3);
+  const dot2 = useSharedValue(0.3);
+  const dot3 = useSharedValue(0.3);
+
+  useEffect(() => {
+    const pulse = (sv: typeof dot1, delay: number) => {
+      sv.value = withDelay(
+        delay,
+        withRepeat(
+          withSequence(
+            withTiming(1, { duration: 350, easing: Easing.inOut(Easing.ease) }),
+            withTiming(0.3, { duration: 350, easing: Easing.inOut(Easing.ease) }),
+          ),
+          -1,
+          false,
+        ),
+      );
+    };
+    pulse(dot1, 0);
+    pulse(dot2, 200);
+    pulse(dot3, 400);
+  }, [dot1, dot2, dot3]);
+
+  const s1 = useAnimatedStyle(() => ({ opacity: dot1.value }));
+  const s2 = useAnimatedStyle(() => ({ opacity: dot2.value }));
+  const s3 = useAnimatedStyle(() => ({ opacity: dot3.value }));
+
+  return (
+    <View style={styles.typingDots}>
+      <Animated.View style={[styles.dot, s1]} />
+      <Animated.View style={[styles.dot, s2]} />
+      <Animated.View style={[styles.dot, s3]} />
+    </View>
+  );
+}
 
 export default function ChatbotScreen() {
   const {
@@ -24,12 +78,15 @@ export default function ChatbotScreen() {
     sendMessage,
     pendingMessage,
     clearPendingMessage,
+    startNewConversation,
   } = useBotpress();
 
-  const [inputText, setInputText] = React.useState("");
+  const [inputText, setInputText] = useState("");
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
+  const lastAutoSpokenIdRef = useRef<string | null>(null);
 
-  // Auto-send pending message set by quick actions
   useFocusEffect(
     useCallback(() => {
       if (pendingMessage && !isInitializing && !isLoading) {
@@ -44,6 +101,37 @@ export default function ChatbotScreen() {
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
   }, []);
 
+  const speakText = useCallback((id: string, text: string) => {
+    const plain = text
+      .replace(/#{1,6}\s+/g, "")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/\*(.*?)\*/g, "$1")
+      .replace(/`{1,3}([\s\S]*?)`{1,3}/g, "$1")
+      .replace(/^[-*]\s+/gm, "")
+      .replace(/^\d+\.\s+/gm, "")
+      .replace(/\n{2,}/g, ". ")
+      .replace(/\n/g, " ")
+      .trim();
+    Speech.stop();
+    setSpeakingId(id);
+    Speech.speak(plain, {
+      language: "en-US",
+      rate: 0.9,
+      onDone: () => setSpeakingId(null),
+      onStopped: () => setSpeakingId(null),
+      onError: () => setSpeakingId(null),
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!ttsEnabled || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.sender !== "bot" || !last.text) return;
+    if (last.id === lastAutoSpokenIdRef.current) return;
+    lastAutoSpokenIdRef.current = last.id;
+    speakText(last.id, last.text);
+  }, [messages, ttsEnabled, speakText]);
+
   const handleSend = async (text: string) => {
     if (!text.trim() || isLoading || isInitializing) return;
     setInputText("");
@@ -55,38 +143,68 @@ export default function ChatbotScreen() {
   const handleSendMessage = () => handleSend(inputText);
   const handleChoiceSelect = (value: string) => handleSend(value);
 
+  const handleSpeakMessage = (id: string, text: string) => {
+    if (speakingId === id) { Speech.stop(); setSpeakingId(null); }
+    else { speakText(id, text); }
+  };
+
+  const toggleTTS = () => {
+    if (ttsEnabled) { Speech.stop(); setSpeakingId(null); }
+    setTtsEnabled((v) => !v);
+  };
+
+  const handleNewConversation = () => {
+    Alert.alert(
+      "New Conversation",
+      "Start a fresh chat? The current conversation will be cleared.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Start Fresh",
+          style: "destructive",
+          onPress: () => {
+            Speech.stop();
+            setSpeakingId(null);
+            setInputText("");
+            lastAutoSpokenIdRef.current = null;
+            startNewConversation();
+          },
+        },
+      ],
+    );
+  };
+
   const formatTime = (date: Date) =>
-    date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
 
   const renderMessage = ({ item }: { item: ChatMessage }) => {
     if (item.sender === "bot") {
+      const isSpeaking = speakingId === item.id;
       return (
-        <View style={styles.botMessageContainer}>
+        <Animated.View entering={FadeInLeft.duration(300)} style={styles.botMessageContainer}>
           <View style={styles.botIconContainer}>
-            <MaterialCommunityIcons
-              name="robot-outline"
-              size={24}
-              color={Colors.ui.white}
-            />
+            <MaterialCommunityIcons name="robot-outline" size={24} color={Colors.ui.white} />
           </View>
           <View style={styles.botBubbleWrapper}>
             <View style={[styles.messageBubble, styles.botMessage]}>
-              <Text style={styles.messageText}>{item.text}</Text>
-              <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+              <Markdown style={markdownStyles}>{item.text}</Markdown>
+              <View style={styles.messageFooter}>
+                <Text style={styles.timestamp}>{formatTime(item.timestamp)}</Text>
+                <Pressable onPress={() => handleSpeakMessage(item.id, item.text)} style={styles.speakButton} hitSlop={8}>
+                  <MaterialCommunityIcons
+                    name={isSpeaking ? "volume-high" : "volume-medium"}
+                    size={15}
+                    color={isSpeaking ? Colors.agribot.primary : Colors.ui.textMuted}
+                  />
+                </Pressable>
+              </View>
             </View>
             {item.choices && item.choices.length > 0 && (
               <View style={styles.choicesContainer}>
                 {item.choices.map((choice) => (
                   <Pressable
                     key={choice.value}
-                    style={({ pressed }) => [
-                      styles.choiceButton,
-                      pressed && styles.choiceButtonPressed,
-                    ]}
+                    style={({ pressed }) => [styles.choiceButton, pressed && styles.choiceButtonPressed]}
                     onPress={() => handleChoiceSelect(choice.value)}
                     disabled={isLoading}
                   >
@@ -96,16 +214,17 @@ export default function ChatbotScreen() {
               </View>
             )}
           </View>
-        </View>
+        </Animated.View>
       );
     }
 
     return (
-      <View style={styles.userMessageContainer}>
+      <Animated.View entering={FadeInRight.duration(250)} style={styles.userMessageContainer}>
         <View style={[styles.messageBubble, styles.userMessage]}>
           <Text style={styles.userMessageText}>{item.text}</Text>
+          <Text style={styles.userTimestamp}>{formatTime(item.timestamp)}</Text>
         </View>
-      </View>
+      </Animated.View>
     );
   };
 
@@ -118,8 +237,31 @@ export default function ChatbotScreen() {
     );
   }
 
+  const showSend = inputText.trim().length > 0;
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+
+      {/* Header */}
+      <Animated.View entering={FadeIn.duration(350)} style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Image source={require("../../assets/images/logo.png")} style={styles.headerLogo} />
+          <Text style={styles.headerTitle}>AgriBot</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <Pressable onPress={toggleTTS} style={styles.headerButton} hitSlop={8}>
+            <MaterialCommunityIcons
+              name={ttsEnabled ? "volume-high" : "volume-off"}
+              size={22}
+              color={ttsEnabled ? Colors.agribot.primary : Colors.ui.textSecondary}
+            />
+          </Pressable>
+          <Pressable onPress={handleNewConversation} style={styles.headerButton} hitSlop={8}>
+            <MaterialCommunityIcons name="chat-plus-outline" size={22} color={Colors.ui.textSecondary} />
+          </Pressable>
+        </View>
+      </Animated.View>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
@@ -137,17 +279,9 @@ export default function ChatbotScreen() {
         {isLoading && (
           <View style={styles.loadingContainer}>
             <View style={styles.botIconContainer}>
-              <MaterialCommunityIcons
-                name="robot-outline"
-                size={20}
-                color={Colors.ui.white}
-              />
+              <MaterialCommunityIcons name="robot-outline" size={20} color={Colors.ui.white} />
             </View>
-            <View style={styles.typingDots}>
-              <View style={styles.dot} />
-              <View style={styles.dot} />
-              <View style={styles.dot} />
-            </View>
+            <TypingDots />
           </View>
         )}
 
@@ -162,41 +296,82 @@ export default function ChatbotScreen() {
             maxLength={500}
             editable={!isLoading && !isInitializing}
           />
-          <Pressable
-            style={[
-              styles.sendButton,
-              (!inputText.trim() || isLoading) && styles.sendButtonDisabled,
-            ]}
-            onPress={handleSendMessage}
-            disabled={!inputText.trim() || isLoading}
-          >
-            <MaterialCommunityIcons
-              name="send"
-              size={24}
-              color={Colors.ui.white}
-            />
-          </Pressable>
+          {showSend && (
+            <Pressable
+              style={[styles.sendButton, isLoading && styles.sendButtonDisabled]}
+              onPress={handleSendMessage}
+              disabled={isLoading}
+            >
+              <MaterialCommunityIcons name="send" size={22} color={Colors.ui.white} />
+            </Pressable>
+          )}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
+const markdownStyles = {
+  body: { margin: 0, padding: 0 },
+  paragraph: { fontSize: 14, lineHeight: 21, color: Colors.ui.textPrimary, marginTop: 0, marginBottom: 4 },
+  heading1: { fontSize: 17, fontWeight: "700" as const, color: Colors.ui.textPrimary, marginBottom: 6, marginTop: 4 },
+  heading2: { fontSize: 15, fontWeight: "700" as const, color: Colors.ui.textPrimary, marginBottom: 4, marginTop: 4 },
+  heading3: { fontSize: 14, fontWeight: "700" as const, color: Colors.ui.textPrimary, marginBottom: 2, marginTop: 4 },
+  strong: { fontWeight: "700" as const, color: Colors.ui.textPrimary },
+  em: { fontStyle: "italic" as const },
+  bullet_list: { marginBottom: 4 },
+  ordered_list: { marginBottom: 4 },
+  list_item: { marginBottom: 2 },
+  bullet_list_icon: { color: Colors.agribot.primary, marginTop: 4 },
+  ordered_list_icon: { color: Colors.agribot.primary },
+  code_inline: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    fontSize: 13,
+    fontFamily: "monospace",
+    color: Colors.agribot.dark,
+  },
+  fence: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    padding: 10,
+    marginVertical: 6,
+    fontSize: 13,
+    fontFamily: "monospace",
+    color: Colors.ui.textPrimary,
+  },
+  blockquote: {
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.agribot.primary,
+    paddingLeft: 10,
+    marginLeft: 0,
+    marginVertical: 4,
+    opacity: 0.85,
+  },
+  hr: { backgroundColor: "#e0e0e0", height: 1, marginVertical: 8 },
+  link: { color: Colors.agribot.primary },
+};
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.ui.backgroundAlt,
-  },
-  centerContent: {
-    justifyContent: "center",
+  container: { flex: 1, backgroundColor: Colors.ui.backgroundAlt },
+  centerContent: { justifyContent: "center", alignItems: "center", gap: 16 },
+  header: {
+    flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    flexDirection: "column",
     justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: Colors.ui.background,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
   },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  headerLogo: { width: 32, height: 32, borderRadius: 8 },
+  headerTitle: { fontSize: 18, fontWeight: "700", color: Colors.ui.textPrimary },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 4 },
+  headerButton: { padding: 8 },
+  keyboardAvoidingView: { flex: 1, flexDirection: "column", justifyContent: "space-between" },
   messagesList: {
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -205,15 +380,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "flex-end",
   },
-  botMessageContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 16,
-    gap: 12,
-  },
-  botBubbleWrapper: {
-    flex: 1,
-  },
+  botMessageContainer: { flexDirection: "row", alignItems: "flex-start", marginBottom: 16, gap: 12 },
+  botBubbleWrapper: { flex: 1 },
   botIconContainer: {
     width: 40,
     height: 40,
@@ -224,12 +392,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     marginTop: 2,
   },
-  messageBubble: {
-    maxWidth: "100%",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
+  messageBubble: { maxWidth: "100%", paddingHorizontal: 16, paddingVertical: 12, borderRadius: 16 },
   botMessage: {
     backgroundColor: Colors.ui.cardBackground,
     shadowColor: Colors.ui.shadowColor,
@@ -238,35 +401,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  userMessageContainer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 16,
-  },
-  userMessage: {
-    backgroundColor: Colors.agribot.primary,
-    maxWidth: "80%",
-  },
-  messageText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: Colors.ui.textPrimary,
-    marginBottom: 4,
-  },
-  userMessageText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: Colors.ui.white,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: Colors.ui.textMuted,
-    marginTop: 4,
-  },
-  choicesContainer: {
-    marginTop: 8,
-    gap: 8,
-  },
+  messageFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
+  speakButton: { padding: 2 },
+  userMessageContainer: { flexDirection: "row", justifyContent: "flex-end", marginBottom: 16 },
+  userMessage: { backgroundColor: Colors.agribot.primary, maxWidth: "80%" },
+  userMessageText: { fontSize: 14, lineHeight: 20, color: Colors.ui.white },
+  timestamp: { fontSize: 11, color: Colors.ui.textMuted },
+  userTimestamp: { fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 4, alignSelf: "flex-end" },
+  choicesContainer: { marginTop: 8, gap: 8 },
   choiceButton: {
     borderWidth: 1.5,
     borderColor: Colors.agribot.primary,
@@ -275,14 +417,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignSelf: "flex-start",
   },
-  choiceButtonPressed: {
-    backgroundColor: "rgba(29, 184, 84, 0.1)",
-  },
-  choiceButtonText: {
-    fontSize: 14,
-    color: Colors.agribot.primary,
-    fontWeight: "500",
-  },
+  choiceButtonPressed: { backgroundColor: "rgba(29, 184, 84, 0.1)" },
+  choiceButtonText: { fontSize: 14, color: Colors.agribot.primary, fontWeight: "500" },
   loadingContainer: {
     paddingHorizontal: 16,
     paddingBottom: 12,
@@ -290,17 +426,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: 12,
   },
-  typingDots: {
-    flexDirection: "row",
-    gap: 4,
-    alignItems: "center",
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.agribot.primary,
-  },
+  typingDots: { flexDirection: "row", gap: 4, alignItems: "center" },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.agribot.primary },
   inputContainer: {
     flexDirection: "row",
     paddingHorizontal: 16,
@@ -308,7 +435,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.ui.background,
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
-    gap: 12,
+    gap: 8,
     alignItems: "flex-end",
   },
   input: {
@@ -322,19 +449,13 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   sendButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Colors.agribot.primary,
     justifyContent: "center",
     alignItems: "center",
   },
-  sendButtonDisabled: {
-    opacity: 0.5,
-  },
-  connectingText: {
-    fontSize: 14,
-    color: Colors.ui.textSecondary,
-    marginTop: 8,
-  },
+  sendButtonDisabled: { opacity: 0.5 },
+  connectingText: { fontSize: 14, color: Colors.ui.textSecondary, marginTop: 8 },
 });

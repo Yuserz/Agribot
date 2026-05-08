@@ -111,6 +111,10 @@ export async function getMessages(
   return [...data.messages].reverse();
 }
 
+export async function resetConversation(): Promise<void> {
+  await AsyncStorage.removeItem(STORAGE.CONV_ID);
+}
+
 export async function pollForBotReply(
   session: BotpressSession,
   afterTimestamp: string,

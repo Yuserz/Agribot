@@ -4,13 +4,8 @@ import { useBotpress } from "@/context/botpress";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, FadeInRight, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -55,11 +50,6 @@ export default function HomeScreen() {
     },
   ];
 
-  const handleQuickAction = (message: string) => {
-    setPendingMessage(message);
-    router.push("/(tabs)/chatbot");
-  };
-
   const tips = [
     {
       id: 1,
@@ -87,106 +77,77 @@ export default function HomeScreen() {
     },
   ];
 
+  const handleQuickAction = (message: string) => {
+    setPendingMessage(message);
+    router.push("/(tabs)/chatbot");
+  };
+
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: Colors.ui.background }]}
-      edges={["top", "left", "right"]}
-    >
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Green Header Section */}
-        <LinearGradient
-          colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.headerSection}
-        >
-          <Text style={styles.greeting}>Hello, {displayName}! 👋</Text>
-          <Text style={styles.subGreeting}>How can I help you today?</Text>
-        </LinearGradient>
+    <SafeAreaView style={[styles.container, { backgroundColor: Colors.ui.background }]} edges={["top", "left", "right"]}>
+      <ScrollView contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+
+        {/* Green Header */}
+        <Animated.View entering={FadeIn.duration(450)}>
+          <LinearGradient
+            colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.headerSection}
+          >
+            <Text style={styles.greeting}>Hello, {displayName}! 👋</Text>
+            <Text style={styles.subGreeting}>How can I help you today?</Text>
+          </LinearGradient>
+        </Animated.View>
 
         {/* Quick Actions Card */}
-        <View style={[styles.card, styles.quickActionsCard]}>
+        <Animated.View entering={FadeInDown.delay(150).duration(450)} style={[styles.card, styles.quickActionsCard]}>
           <Text style={styles.cardTitle}>Quick Actions</Text>
           <View style={styles.actionsGrid}>
-            {quickActions.map((action) => (
-              <TouchableOpacity key={action.id} style={styles.actionItem} onPress={() => handleQuickAction(action.message)}>
-                <View
-                  style={[
-                    styles.actionIconBg,
-                    { backgroundColor: action.bgColor },
-                  ]}
-                >
-                  <MaterialCommunityIcons
-                    name={action.icon as any}
-                    size={32}
-                    color={action.iconColor}
-                  />
-                </View>
-                <Text
-                  style={[styles.actionLabel, { color: Colors.ui.textPrimary }]}
-                >
-                  {action.label}
-                </Text>
-              </TouchableOpacity>
+            {quickActions.map((action, index) => (
+              <Animated.View
+                key={action.id}
+                entering={ZoomIn.delay(200 + index * 80).duration(350)}
+                style={styles.actionItem}
+              >
+                <TouchableOpacity onPress={() => handleQuickAction(action.message)} style={styles.actionTouchable}>
+                  <View style={[styles.actionIconBg, { backgroundColor: action.bgColor }]}>
+                    <MaterialCommunityIcons name={action.icon as any} size={32} color={action.iconColor} />
+                  </View>
+                  <Text style={[styles.actionLabel, { color: Colors.ui.textPrimary }]}>{action.label}</Text>
+                </TouchableOpacity>
+              </Animated.View>
             ))}
           </View>
-        </View>
+        </Animated.View>
 
-        {/* Today's Tips Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: Colors.ui.textPrimary }]}>
-            Today&apos;s Tips
-          </Text>
-          {tips.map((tip) => (
-            <View
+        {/* Today's Tips */}
+        <Animated.View entering={FadeIn.delay(320).duration(400)} style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: Colors.ui.textPrimary }]}>Today&apos;s Tips</Text>
+          {tips.map((tip, index) => (
+            <Animated.View
               key={tip.id}
-              style={[
-                styles.tipCard,
-                { backgroundColor: Colors.ui.cardBackground },
-              ]}
+              entering={FadeInRight.delay(420 + index * 110).duration(400)}
+              style={[styles.tipCard, { backgroundColor: Colors.ui.cardBackground }]}
             >
-              <View
-                style={[styles.tipIconBg, { backgroundColor: tip.bgColor }]}
-              >
-                <MaterialCommunityIcons
-                  name={tip.icon as any}
-                  size={28}
-                  color={tip.iconColor}
-                />
+              <View style={[styles.tipIconBg, { backgroundColor: tip.bgColor }]}>
+                <MaterialCommunityIcons name={tip.icon as any} size={28} color={tip.iconColor} />
               </View>
               <View style={styles.tipContent}>
-                <Text
-                  style={[styles.tipTitle, { color: Colors.ui.textPrimary }]}
-                >
-                  {tip.title}
-                </Text>
-                <Text
-                  style={[
-                    styles.tipDescription,
-                    { color: Colors.ui.textSecondary },
-                  ]}
-                >
-                  {tip.description}
-                </Text>
+                <Text style={[styles.tipTitle, { color: Colors.ui.textPrimary }]}>{tip.title}</Text>
+                <Text style={[styles.tipDescription, { color: Colors.ui.textSecondary }]}>{tip.description}</Text>
               </View>
-            </View>
+            </Animated.View>
           ))}
-        </View>
+        </Animated.View>
+
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 0,
-  },
+  container: { flex: 1 },
+  contentContainer: { paddingBottom: 0 },
   headerSection: {
     paddingHorizontal: 20,
     paddingTop: 24,
@@ -194,17 +155,8 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
   },
-  greeting: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: Colors.ui.white,
-    marginBottom: 8,
-  },
-  subGreeting: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "rgba(255, 255, 255, 0.9)",
-  },
+  greeting: { fontSize: 32, fontWeight: "700", color: Colors.ui.white, marginBottom: 8 },
+  subGreeting: { fontSize: 16, fontWeight: "500", color: "rgba(255, 255, 255, 0.9)" },
   card: {
     marginHorizontal: 16,
     marginTop: 20,
@@ -218,25 +170,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  quickActionsCard: {
-    marginBottom: 24,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Colors.ui.textPrimary,
-    marginBottom: 16,
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  actionItem: {
-    width: "48%",
-    alignItems: "center",
-    marginBottom: 16,
-  },
+  quickActionsCard: { marginBottom: 24 },
+  cardTitle: { fontSize: 18, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 16 },
+  actionsGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
+  actionItem: { width: "48%", marginBottom: 16 },
+  actionTouchable: { alignItems: "center" },
   actionIconBg: {
     width: 64,
     height: 64,
@@ -245,21 +183,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  actionLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  section: {
-    marginHorizontal: 16,
-    marginBottom: 20,
-    marginTop: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 12,
-  },
+  actionLabel: { fontSize: 14, fontWeight: "600", textAlign: "center" },
+  section: { marginHorizontal: 16, marginBottom: 20, marginTop: 8 },
+  sectionTitle: { fontSize: 18, fontWeight: "700", marginBottom: 12 },
   tipCard: {
     flexDirection: "row",
     padding: 16,
@@ -280,16 +206,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
     flexShrink: 0,
   },
-  tipContent: {
-    flex: 1,
-  },
-  tipTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  tipDescription: {
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  tipContent: { flex: 1 },
+  tipTitle: { fontSize: 16, fontWeight: "600", marginBottom: 4 },
+  tipDescription: { fontSize: 13, lineHeight: 18 },
 });

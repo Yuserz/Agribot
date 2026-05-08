@@ -1,10 +1,15 @@
+import { Colors } from "@/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+  FadeInUp,
+  ZoomIn,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { Colors } from "@/constants/theme";
 
 interface FeatureItem {
   id: number;
@@ -13,42 +18,20 @@ interface FeatureItem {
 }
 
 const features: FeatureItem[] = [
-  {
-    id: 1,
-    title: "Expert Guidance",
-    description: "Get answers on planting, care, and harvesting",
-  },
-  {
-    id: 2,
-    title: "Sustainable Practices",
-    description: "Learn eco-friendly farming methods",
-  },
-  {
-    id: 3,
-    title: "24/7 Support",
-    description: "Get help anytime, anywhere",
-  },
+  { id: 1, title: "Expert Guidance", description: "Get answers on planting, care, and harvesting" },
+  { id: 2, title: "Sustainable Practices", description: "Learn eco-friendly farming methods" },
+  { id: 3, title: "24/7 Support", description: "Get help anytime, anywhere" },
 ];
 
 export default function WelcomeScreen() {
   const router = useRouter();
 
-  const handleGetStarted = () => {
-    router.push("/auth/signup");
-  };
-
-  const handleAlreadyHaveAccount = () => {
-    router.push("/auth/login");
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
         {/* Logo */}
-        <View style={styles.logoContainer}>
+        <Animated.View entering={ZoomIn.springify().damping(14)} style={styles.logoContainer}>
           <View style={styles.logoBox}>
             <Image
               source={require("@/assets/images/logo.png")}
@@ -56,20 +39,26 @@ export default function WelcomeScreen() {
               resizeMode="contain"
             />
           </View>
-        </View>
+        </Animated.View>
 
         {/* Title */}
-        <Text style={styles.title}>Welcome to AgriBot</Text>
+        <Animated.View entering={FadeInDown.delay(280).duration(500)}>
+          <Text style={styles.title}>Welcome to AgriBot</Text>
+        </Animated.View>
 
         {/* Subtitle */}
-        <Text style={styles.subtitle}>
-          Your expert guide for sustainable dragon fruit farming
-        </Text>
+        <Animated.View entering={FadeInDown.delay(420).duration(500)}>
+          <Text style={styles.subtitle}>Your expert guide for sustainable dragon fruit farming</Text>
+        </Animated.View>
 
         {/* Features */}
         <View style={styles.featuresContainer}>
-          {features.map((feature) => (
-            <View key={feature.id} style={styles.featureItem}>
+          {features.map((feature, index) => (
+            <Animated.View
+              key={feature.id}
+              entering={FadeInRight.delay(580 + index * 130).duration(450)}
+              style={styles.featureItem}
+            >
               <LinearGradient
                 colors={["#25d366", Colors.agribot.primary]}
                 start={{ x: 0, y: 0 }}
@@ -80,19 +69,17 @@ export default function WelcomeScreen() {
               </LinearGradient>
               <View style={styles.featureContent}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>
-                  {feature.description}
-                </Text>
+                <Text style={styles.featureDescription}>{feature.description}</Text>
               </View>
-            </View>
+            </Animated.View>
           ))}
         </View>
 
         {/* Buttons */}
-        <View style={styles.buttonsContainer}>
+        <Animated.View entering={FadeInUp.delay(1020).duration(500)} style={styles.buttonsContainer}>
           <Pressable
             style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
-            onPress={handleGetStarted}
+            onPress={() => router.push("/auth/signup")}
           >
             <LinearGradient
               colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
@@ -106,17 +93,13 @@ export default function WelcomeScreen() {
           </Pressable>
 
           <Pressable
-            style={({ pressed }) => [
-              styles.secondaryButton,
-              { opacity: pressed ? 0.85 : 1 },
-            ]}
-            onPress={handleAlreadyHaveAccount}
+            style={({ pressed }) => [styles.secondaryButton, { opacity: pressed ? 0.85 : 1 }]}
+            onPress={() => router.push("/auth/login")}
           >
-            <Text style={styles.secondaryButtonText}>
-              I Already Have an Account
-            </Text>
+            <Text style={styles.secondaryButtonText}>I Already Have an Account</Text>
           </Pressable>
-        </View>
+        </Animated.View>
+
       </ScrollView>
     </SafeAreaView>
   );
