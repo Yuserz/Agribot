@@ -4,16 +4,17 @@ import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { session, loading } = useAuth();
   const [dotOpacity] = useState([
     new Animated.Value(0.3),
     new Animated.Value(0.3),
     new Animated.Value(0.3),
   ]);
 
-  // Animate the loading dots
   useEffect(() => {
     const animateDots = () => {
       Animated.loop(
@@ -64,13 +65,14 @@ export default function SplashScreen() {
 
     animateDots();
 
-    // Auto-navigate after 3 seconds
     const timer = setTimeout(() => {
-      router.push("/welcome");
+      if (!loading) {
+        router.replace(session ? "/(tabs)" : "/welcome");
+      }
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [loading, session]);
 
   return (
     <View style={styles.container}>

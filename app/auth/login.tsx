@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
+import { supabase } from "@/utils/supabase";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -20,18 +23,40 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    // TODO: Implement login logic
-    router.push("/(tabs)");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+    } else {
+      router.replace("/(tabs)");
+    }
   };
 
   const handleSignUp = () => {
     router.push("/auth/signup");
   };
 
-  const handleForgotPassword = () => {
-    // TODO: Navigate to forgot password screen
+  const handleForgotPassword = async () => {
+    if (!email) {
+      Alert.alert("Reset Password", "Enter your email above, then tap Forgot Password.");
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      Alert.alert("Check your email", "A password reset link has been sent.");
+    }
   };
 
   return (
@@ -121,15 +146,23 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
+        {/* Error Message */}
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
         {/* Login Button */}
         <Pressable
           style={({ pressed }) => [
             styles.loginButton,
-            { opacity: pressed ? 0.85 : 1 },
+            { opacity: pressed || loading ? 0.85 : 1 },
           ]}
           onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.loginButtonText}>Login</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
         </Pressable>
 
         {/* Sign Up Link */}
@@ -272,5 +305,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: Colors.agribot.primary,
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#e53e3e",
+    marginBottom: 12,
+    textAlign: "center",
   },
 });

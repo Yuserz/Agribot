@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
+import { supabase } from "@/utils/supabase";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -24,10 +27,49 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSignUp = () => {
-    // TODO: Implement sign up logic
-    router.push("/(tabs)");
+  const handleSignUp = async () => {
+    if (!fullName || !email || !password || !confirmPassword) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (!agreedToTerms) {
+      setError("You must agree to the Terms of Service and Privacy Policy.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, phone },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      setError(error.message);
+      return;
+    }
+    if (data.session) {
+      router.replace("/(tabs)");
+    } else {
+      Alert.alert(
+        "Check your email",
+        "A confirmation link has been sent to your email. Please verify before logging in.",
+        [{ text: "OK", onPress: () => router.replace("/auth/login") }],
+      );
+    }
   };
 
   const handleLogin = () => {
@@ -183,15 +225,23 @@ export default function SignUpScreen() {
           </View>
         </View>
 
+        {/* Error Message */}
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
+
         {/* Sign Up Button */}
         <Pressable
           style={({ pressed }) => [
             styles.signUpButton,
-            { opacity: pressed ? 0.85 : 1 },
+            { opacity: pressed || loading ? 0.85 : 1 },
           ]}
           onPress={handleSignUp}
+          disabled={loading}
         >
-          <Text style={styles.signUpButtonText}>Sign Up</Text>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.signUpButtonText}>Sign Up</Text>
+          )}
         </Pressable>
 
         {/* Login Link */}
@@ -331,5 +381,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: Colors.agribot.primary,
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#e53e3e",
+    marginBottom: 12,
+    textAlign: "center",
   },
 });

@@ -1,18 +1,22 @@
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const userProfile = {
-    name: "guest",
-    email: "guest@gmail.com",
-    stats: {
-      chats: 24,
-      topics: 12,
-      days: 7,
-    },
+  const { user, signOut } = useAuth();
+  const router = useRouter();
+
+  const displayName =
+    user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  const displayEmail = user?.email || "";
+
+  const handleLogout = async () => {
+    await signOut();
+    router.replace("/welcome");
   };
 
   const menuItems = [
@@ -66,8 +70,8 @@ export default function ProfileScreen() {
               />
             </View>
           </View>
-          <Text style={styles.profileName}>{userProfile.name}</Text>
-          <Text style={styles.profileEmail}>{userProfile.email}</Text>
+          <Text style={styles.profileName}>{displayName}</Text>
+          <Text style={styles.profileEmail}>{displayEmail}</Text>
         </View>
 
         {/* Your Activity Section */}
@@ -112,6 +116,18 @@ export default function ProfileScreen() {
             <Text style={styles.aboutValue}>1.0.0</Text>
           </View>
         </View>
+
+        {/* Logout Button */}
+        <Pressable
+          style={({ pressed }) => [
+            styles.logoutButton,
+            { opacity: pressed ? 0.8 : 1 },
+          ]}
+          onPress={handleLogout}
+        >
+          <MaterialCommunityIcons name="logout" size={20} color="#e53e3e" />
+          <Text style={styles.logoutText}>Log Out</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -310,5 +326,22 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 80,
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 16,
+    marginBottom: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: "#e53e3e",
+    gap: 8,
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#e53e3e",
   },
 });
