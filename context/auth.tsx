@@ -50,3 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export const useAuth = () => useContext(AuthContext);
+
+// Best-effort human-readable name for a user: full name, then email handle, then fallback.
+export const getDisplayName = (user: User | null, fallback = "User") =>
+  user?.user_metadata?.full_name || user?.email?.split("@")[0] || fallback;

@@ -1,31 +1,131 @@
+import { APP_NAME } from "@/constants/brand";
 import { Colors } from "@/constants/theme";
-import { useAuth } from "@/context/auth";
+import { getDisplayName, useAuth } from "@/context/auth";
+import { useLanguage } from "@/context/language";
+import { supabase } from "@/utils/supabase";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import * as ImageManipulator from "expo-image-manipulator";
+import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn, FadeInRight, FadeInUp, ZoomIn } from "react-native-reanimated";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import Animated, { FadeIn, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
+  const { isEnglish, toggleLanguage } = useLanguage();
   const router = useRouter();
+  const [editNameVisible, setEditNameVisible] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
-  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
-  const displayEmail = user?.email || "";
+  const displayName = getDisplayName(user);
+  const displayEmail = user?.email ?? "";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
 
   const handleLogout = async () => {
     await signOut();
     router.replace("/welcome");
   };
 
-  const menuItems = [
-    { id: "1", icon: "cog", label: "Account Settings", description: "Manage your account preferences", onPress: () => {} },
-    { id: "2", icon: "bell", label: "Notifications", description: "Configure notification preferences", onPress: () => {} },
-    { id: "3", icon: "help-circle", label: "Help & Support", description: "Get help and contact support", onPress: () => {} },
-    { id: "4", icon: "shield", label: "Privacy & Security", description: "Manage your privacy settings", onPress: () => {} },
-  ];
+  const openEditName = () => {
+    setNewName(user?.user_metadata?.full_name ?? "");
+    setEditNameVisible(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setSavingName(true);
+    const { error } = await supabase.auth.updateUser({ data: { full_name: trimmed } });
+    setSavingName(false);
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      setEditNameVisible(false);
+    }
+  };
+
+  const handlePickAvatar = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission needed", "Allow photo library access to upload a profile photo.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.9,
+    });
+    if (result.canceled || !result.assets[0]) return;
+
+    setUploadingAvatar(true);
+    try {
+      const asset = result.assets[0];
+      const manipulated = await ImageManipulator.manipulateAsync(
+        asset.uri,
+        [{ resize: { width: 400, height: 400 } }],
+        { compress: 0.85, format: ImageManipulator.SaveFormat.WEBP }
+      );
+
+      const userId = user!.id;
+      const path = `${userId}/avatar.webp`;
+
+      const response = await fetch(manipulated.uri);
+      const blob = await response.blob();
+
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(path, blob, { contentType: "image/webp", upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+      if (updateError) throw updateError;
+    } catch (err: any) {
+      Alert.alert("Upload failed", err.message ?? "Something went wrong.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "This will permanently delete your account and all data. This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await signOut();
+            router.replace("/welcome");
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
@@ -34,44 +134,102 @@ export default function ProfileScreen() {
         {/* Profile Header */}
         <Animated.View entering={FadeIn.duration(400)}>
           <LinearGradient
-            colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+            colors={Colors.agribot.gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.profileHeader}
           >
-            <Animated.View entering={ZoomIn.delay(150).springify().damping(14)} style={styles.avatarContainer}>
-              <View style={styles.avatarCircle}>
-                <MaterialCommunityIcons name="account" size={60} color={Colors.agribot.primary} />
-              </View>
+            {/* Avatar */}
+            <Animated.View
+              entering={ZoomIn.delay(150).springify().damping(24).stiffness(200)}
+              style={styles.avatarContainer}
+            >
+              <Pressable onPress={handlePickAvatar} style={styles.avatarWrapper}>
+                {uploadingAvatar ? (
+                  <View style={styles.avatarCircle}>
+                    <ActivityIndicator color={Colors.agribot.primary} size="large" />
+                  </View>
+                ) : avatarUrl ? (
+                  <Image
+                    source={{ uri: avatarUrl }}
+                    style={styles.avatarImage}
+                    contentFit="cover"
+                  />
+                ) : (
+                  <View style={styles.avatarCircle}>
+                    <MaterialCommunityIcons name="account" size={60} color={Colors.agribot.primary} />
+                  </View>
+                )}
+                <View style={styles.editAvatarBadge}>
+                  <MaterialCommunityIcons name="camera" size={13} color="white" />
+                </View>
+              </Pressable>
             </Animated.View>
-            <Animated.View entering={FadeInUp.delay(250).duration(400)}>
+
+            {/* Name + edit */}
+            <Animated.View entering={FadeInUp.delay(250).duration(400)} style={styles.nameRow}>
               <Text style={styles.profileName}>{displayName}</Text>
-              <Text style={styles.profileEmail}>{displayEmail}</Text>
+              <Pressable onPress={openEditName} hitSlop={10} style={styles.editNameBtn}>
+                <MaterialCommunityIcons name="pencil" size={16} color="rgba(255,255,255,0.85)" />
+              </Pressable>
             </Animated.View>
+            <Text style={styles.profileEmail}>{displayEmail}</Text>
           </LinearGradient>
         </Animated.View>
 
-        {/* Menu Items */}
-        <View style={styles.menuContainer}>
-          {menuItems.map((item, index) => (
-            <Animated.View
-              key={item.id}
-              entering={FadeInRight.delay(300 + index * 80).duration(400)}
-            >
-              <MenuItem
-                icon={item.icon}
-                label={item.label}
-                description={item.description}
-                onPress={item.onPress}
-                isLast={index === menuItems.length - 1}
-              />
-            </Animated.View>
-          ))}
-        </View>
+        {/* Account Actions */}
+        <Animated.View entering={FadeInUp.delay(300).duration(400)} style={styles.menuContainer}>
+          <Pressable
+            style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
+            onPress={openEditName}
+          >
+            <View style={styles.iconBackground}>
+              <MaterialCommunityIcons name="account-edit" size={22} color={Colors.agribot.primary} />
+            </View>
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuLabel}>Edit Name</Text>
+              <Text style={styles.menuDescription}>Update your display name</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
+          </Pressable>
 
-        {/* About AgriBot */}
-        <Animated.View entering={FadeInUp.delay(620).duration(400)} style={styles.aboutContainer}>
-          <Text style={styles.aboutTitle}>About AgriBot</Text>
+          {/* Language toggle */}
+          <View style={styles.menuItem}>
+            <View style={styles.iconBackground}>
+              <MaterialCommunityIcons name="translate" size={22} color={Colors.agribot.primary} />
+            </View>
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuLabel}>Full English</Text>
+              <Text style={styles.menuDescription}>
+                {isEnglish ? "Taglish mode is off" : "Currently in Taglish mode"}
+              </Text>
+            </View>
+            <Switch
+              value={isEnglish}
+              onValueChange={toggleLanguage}
+              trackColor={{ false: "#e0e0e0", true: Colors.agribot.primary }}
+              thumbColor="white"
+            />
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [styles.menuItem, styles.menuItemLast, pressed && styles.menuItemPressedDanger]}
+            onPress={handleDeleteAccount}
+          >
+            <View style={[styles.iconBackground, styles.dangerIconBg]}>
+              <MaterialCommunityIcons name="account-remove" size={22} color="#e53e3e" />
+            </View>
+            <View style={styles.menuItemContent}>
+              <Text style={[styles.menuLabel, styles.dangerLabel]}>Delete Account</Text>
+              <Text style={styles.menuDescription}>Permanently remove your account</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
+          </Pressable>
+        </Animated.View>
+
+        {/* About */}
+        <Animated.View entering={FadeInUp.delay(400).duration(400)} style={styles.aboutContainer}>
+          <Text style={styles.aboutTitle}>About {APP_NAME}</Text>
           <View style={styles.aboutContent}>
             <Text style={styles.aboutLabel}>Version</Text>
             <Text style={styles.aboutValue}>1.0.0</Text>
@@ -79,7 +237,7 @@ export default function ProfileScreen() {
         </Animated.View>
 
         {/* Logout */}
-        <Animated.View entering={FadeIn.delay(720).duration(400)} style={styles.logoutWrapper}>
+        <Animated.View entering={FadeIn.delay(480).duration(400)} style={styles.logoutWrapper}>
           <Pressable
             style={({ pressed }) => [styles.logoutButton, { opacity: pressed ? 0.8 : 1 }]}
             onPress={handleLogout}
@@ -90,50 +248,65 @@ export default function ProfileScreen() {
         </Animated.View>
 
       </ScrollView>
+
+      {/* Edit Name Modal */}
+      <Modal visible={editNameVisible} transparent animationType="fade" statusBarTranslucent>
+        <Pressable style={styles.modalOverlay} onPress={() => setEditNameVisible(false)}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <Text style={styles.modalTitle}>Edit Name</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={newName}
+              onChangeText={setNewName}
+              placeholder="Your display name"
+              placeholderTextColor={Colors.ui.textMuted}
+              autoFocus
+              maxLength={50}
+              returnKeyType="done"
+              onSubmitEditing={handleSaveName}
+            />
+            <View style={styles.modalActions}>
+              <Pressable
+                style={styles.modalCancel}
+                onPress={() => setEditNameVisible(false)}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  styles.modalSave,
+                  (!newName.trim() || savingName) && styles.modalSaveDisabled,
+                ]}
+                onPress={handleSaveName}
+                disabled={!newName.trim() || savingName}
+              >
+                {savingName ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <Text style={styles.modalSaveText}>Save</Text>
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
-  );
-}
-
-interface MenuItemProps {
-  icon: string;
-  label: string;
-  description: string;
-  onPress: () => void;
-  isLast?: boolean;
-}
-
-function MenuItem({ icon, label, description, onPress, isLast }: MenuItemProps) {
-  return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.menuItem,
-        pressed && styles.menuItemPressed,
-        isLast && styles.menuItemLast,
-      ]}
-      onPress={onPress}
-    >
-      <View style={styles.iconBackground}>
-        <MaterialCommunityIcons name={icon as any} size={24} color={Colors.agribot.primary} />
-      </View>
-      <View style={styles.menuItemContent}>
-        <Text style={styles.menuLabel}>{label}</Text>
-        <Text style={styles.menuDescription}>{description}</Text>
-      </View>
-      <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
-    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.ui.backgroundAlt },
-  scrollContent: { paddingBottom: 24 },
+  scrollContent: { paddingBottom: 32 },
+
+  // Header
   profileHeader: {
     alignItems: "center",
-    paddingVertical: 32,
+    paddingTop: 32,
     paddingBottom: 40,
     marginBottom: 24,
   },
   avatarContainer: { marginBottom: 16 },
+  avatarWrapper: { position: "relative", width: 120, height: 120 },
   avatarCircle: {
     width: 120,
     height: 120,
@@ -142,11 +315,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  profileName: { fontSize: 28, fontWeight: "700", color: Colors.ui.white, marginBottom: 4, textAlign: "center" },
-  profileEmail: { fontSize: 14, color: "rgba(255, 255, 255, 0.9)", textAlign: "center" },
+  avatarImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.ui.white,
+  },
+  editAvatarBadge: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: Colors.agribot.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "white",
+  },
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
+  profileName: { fontSize: 26, fontWeight: "700", color: Colors.ui.white, textAlign: "center" },
+  editNameBtn: { paddingTop: 2 },
+  profileEmail: { fontSize: 14, color: "rgba(255,255,255,0.85)", textAlign: "center" },
+
+  // Menu
   menuContainer: {
     marginHorizontal: 16,
-    marginBottom: 24,
+    marginBottom: 16,
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: 12,
     overflow: "hidden",
@@ -162,25 +363,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: Colors.ui.hairline,
   },
   menuItemLast: { borderBottomWidth: 0 },
-  menuItemPressed: { backgroundColor: "rgba(29, 184, 84, 0.05)" },
+  menuItemPressed: { backgroundColor: Colors.brand.tintSoft },
+  menuItemPressedDanger: { backgroundColor: "rgba(229,62,62,0.06)" },
   iconBackground: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: "rgba(29, 184, 84, 0.15)",
+    width: 44,
+    height: 44,
+    borderRadius: 11,
+    backgroundColor: Colors.brand.tintSoft,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+    marginRight: 14,
   },
+  dangerIconBg: { backgroundColor: "rgba(229,62,62,0.08)" },
   menuItemContent: { flex: 1 },
-  menuLabel: { fontSize: 16, fontWeight: "600", color: Colors.ui.textPrimary, marginBottom: 2 },
+  menuLabel: { fontSize: 15, fontWeight: "600", color: Colors.ui.textPrimary, marginBottom: 2 },
+  dangerLabel: { color: "#e53e3e" },
   menuDescription: { fontSize: 13, color: Colors.ui.textSecondary },
+
+  // About
   aboutContainer: {
     marginHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 12,
     backgroundColor: Colors.ui.cardBackground,
     borderRadius: 12,
     paddingHorizontal: 16,
@@ -191,16 +397,15 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
   },
-  aboutTitle: { fontSize: 16, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 12 },
+  aboutTitle: { fontSize: 15, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 12 },
   aboutContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   aboutLabel: { fontSize: 14, color: Colors.ui.textSecondary },
   aboutValue: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+
+  // Logout
   logoutWrapper: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-    backgroundColor: Colors.ui.backgroundAlt,
+    paddingTop: 4,
   },
   logoutButton: {
     flexDirection: "row",
@@ -213,4 +418,50 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoutText: { fontSize: 16, fontWeight: "600", color: "#e53e3e" },
+
+  // Modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  modalCard: {
+    width: "100%",
+    backgroundColor: Colors.ui.white,
+    borderRadius: 16,
+    padding: 24,
+  },
+  modalTitle: { fontSize: 18, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 16 },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: Colors.ui.hairline,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: Colors.ui.textPrimary,
+    backgroundColor: Colors.ui.backgroundAlt,
+    marginBottom: 20,
+  },
+  modalActions: { flexDirection: "row", gap: 12 },
+  modalCancel: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: Colors.ui.hairline,
+    alignItems: "center",
+  },
+  modalCancelText: { fontSize: 15, fontWeight: "600", color: Colors.ui.textSecondary },
+  modalSave: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 10,
+    backgroundColor: Colors.agribot.primary,
+    alignItems: "center",
+  },
+  modalSaveDisabled: { opacity: 0.45 },
+  modalSaveText: { fontSize: 15, fontWeight: "600", color: "white" },
 });

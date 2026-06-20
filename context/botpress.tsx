@@ -126,13 +126,14 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
         const history = await getMessages(session);
         if (cancelled) return;
 
-        // Strip the silent "hi" init ping from history so it never appears in the UI
-        const visible = history.filter((m, i) => {
-          if (m.userId !== session.userId) return true;
-          const text = m.payload.type === "text" ? m.payload.text : "";
-          const isFirstUserMsg = !history.slice(0, i).some((p) => p.userId === session.userId);
-          return !(isFirstUserMsg && text.toLowerCase() === "hi");
-        });
+        // Strip the silent "hi" init ping (the first user message) so it never appears in the UI
+        const firstUserIdx = history.findIndex((m) => m.userId === session.userId);
+        const firstMsg = history[firstUserIdx];
+        const firstText = firstMsg?.payload.type === "text" ? firstMsg.payload.text : "";
+        const visible =
+          firstText.toLowerCase() === "hi"
+            ? history.filter((_, i) => i !== firstUserIdx)
+            : history;
 
         if (visible.length > 0) {
           setMessages(visible.map((m) => toChatMessage(m, session.userId)));

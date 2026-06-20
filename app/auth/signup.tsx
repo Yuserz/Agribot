@@ -77,7 +77,7 @@ export default function SignUpScreen() {
         {/* Title */}
         <Animated.View entering={FadeInDown.delay(100).duration(450)}>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join AgriBot and start your farming journey</Text>
+          <Text style={styles.subtitle}>Join Tanim, Bes! and start your plant journey</Text>
         </Animated.View>
 
         {/* Full Name */}
@@ -195,7 +195,7 @@ export default function SignUpScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+              colors={Colors.agribot.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.signUpButton}

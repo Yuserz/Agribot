@@ -1,5 +1,7 @@
+import { BOT_NAME } from "@/constants/brand";
 import { Colors } from "@/constants/theme";
 import { ChatMessage, useBotpress } from "@/context/botpress";
+import { useLanguage } from "@/context/language";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import * as Speech from "expo-speech";
@@ -9,7 +11,6 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -81,6 +82,7 @@ export default function ChatbotScreen() {
     startNewConversation,
   } = useBotpress();
 
+  const { isEnglish } = useLanguage();
   const [inputText, setInputText] = useState("");
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
@@ -141,7 +143,6 @@ export default function ChatbotScreen() {
   };
 
   const handleSendMessage = () => handleSend(inputText);
-  const handleChoiceSelect = (value: string) => handleSend(value);
 
   const handleSpeakMessage = (id: string, text: string) => {
     if (speakingId === id) { Speech.stop(); setSpeakingId(null); }
@@ -205,7 +206,7 @@ export default function ChatbotScreen() {
                   <Pressable
                     key={choice.value}
                     style={({ pressed }) => [styles.choiceButton, pressed && styles.choiceButtonPressed]}
-                    onPress={() => handleChoiceSelect(choice.value)}
+                    onPress={() => handleSend(choice.value)}
                     disabled={isLoading}
                   >
                     <Text style={styles.choiceButtonText}>{choice.label}</Text>
@@ -231,8 +232,8 @@ export default function ChatbotScreen() {
   if (isInitializing) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color={Colors.agribot.primary} />
-        <Text style={styles.connectingText}>Connecting to AgriBot...</Text>
+        <ActivityIndicator size="large" color={Colors.brand.primary} />
+        <Text style={styles.connectingText}>{isEnglish ? "Connecting... 🌱" : "Sandali lang, bes... 🌱"}</Text>
       </SafeAreaView>
     );
   }
@@ -245,8 +246,10 @@ export default function ChatbotScreen() {
       {/* Header */}
       <Animated.View entering={FadeIn.duration(350)} style={styles.header}>
         <View style={styles.headerLeft}>
-          <Image source={require("../../assets/images/logo.png")} style={styles.headerLogo} />
-          <Text style={styles.headerTitle}>AgriBot</Text>
+          <View style={styles.headerLogo}>
+            <Text style={styles.headerLogoEmoji}>🌱</Text>
+          </View>
+          <Text style={styles.headerTitle}>{BOT_NAME}</Text>
         </View>
         <View style={styles.headerRight}>
           <Pressable onPress={toggleTTS} style={styles.headerButton} hitSlop={8}>
@@ -288,7 +291,7 @@ export default function ChatbotScreen() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Ask me anything..."
+            placeholder={isEnglish ? "Ask me anything..." : "Itanong mo lang, bes..."}
             placeholderTextColor={Colors.ui.textMuted}
             value={inputText}
             onChangeText={setInputText}
@@ -364,11 +367,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: Colors.ui.background,
     borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    borderBottomColor: Colors.ui.hairline,
   },
   headerLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
-  headerLogo: { width: 32, height: 32, borderRadius: 8 },
-  headerTitle: { fontSize: 18, fontWeight: "700", color: Colors.ui.textPrimary },
+  headerLogo: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: Colors.brand.tintSoft,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerLogoEmoji: { fontSize: 20 },
+  headerTitle: { fontSize: 18, fontWeight: "800", color: Colors.ui.textPrimary },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 4 },
   headerButton: { padding: 8 },
   keyboardAvoidingView: { flex: 1, flexDirection: "column", justifyContent: "space-between" },
@@ -417,7 +428,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignSelf: "flex-start",
   },
-  choiceButtonPressed: { backgroundColor: "rgba(29, 184, 84, 0.1)" },
+  choiceButtonPressed: { backgroundColor: Colors.brand.tintSoft },
   choiceButtonText: { fontSize: 14, color: Colors.agribot.primary, fontWeight: "500" },
   loadingContainer: {
     paddingHorizontal: 16,
@@ -434,7 +445,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: Colors.ui.background,
     borderTopWidth: 1,
-    borderTopColor: "#e0e0e0",
+    borderTopColor: Colors.ui.hairline,
     gap: 8,
     alignItems: "flex-end",
   },

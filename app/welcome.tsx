@@ -1,8 +1,9 @@
+import { APP_NAME, APP_SUBTAGLINE } from "@/constants/brand";
 import { Colors } from "@/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, {
   FadeInDown,
   FadeInRight,
@@ -13,14 +14,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FeatureItem {
   id: number;
+  emoji: string;
   title: string;
   description: string;
 }
 
 const features: FeatureItem[] = [
-  { id: 1, title: "Expert Guidance", description: "Get answers on planting, care, and harvesting" },
-  { id: 2, title: "Sustainable Practices", description: "Learn eco-friendly farming methods" },
-  { id: 3, title: "24/7 Support", description: "Get help anytime, anywhere" },
+  { id: 1, emoji: "🌱", title: "Kahit anong halaman", description: "Tips for any plant — gulay, herbs, succulents, bulaklak" },
+  { id: 2, emoji: "💬", title: "Itanong mo lang", description: "Chat with your plant bestie, walang judging" },
+  { id: 3, emoji: "⏰", title: "24/7 na handa", description: "Get help anytime, day or night" },
 ];
 
 export default function WelcomeScreen() {
@@ -29,26 +31,26 @@ export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
         {/* Logo */}
-        <Animated.View entering={ZoomIn.springify().damping(14)} style={styles.logoContainer}>
-          <View style={styles.logoBox}>
-            <Image
-              source={require("@/assets/images/logo.png")}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
+        <Animated.View entering={ZoomIn.springify().damping(13)} style={styles.logoContainer}>
+          <LinearGradient
+            colors={Colors.brand.gradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.logoBox}
+          >
+            <Text style={styles.logoEmoji}>🌱</Text>
+          </LinearGradient>
         </Animated.View>
 
         {/* Title */}
-        <Animated.View entering={FadeInDown.delay(280).duration(500)}>
-          <Text style={styles.title}>Welcome to AgriBot</Text>
+        <Animated.View entering={FadeInDown.delay(260).duration(500)}>
+          <Text style={styles.title}>{APP_NAME}</Text>
         </Animated.View>
 
         {/* Subtitle */}
-        <Animated.View entering={FadeInDown.delay(420).duration(500)}>
-          <Text style={styles.subtitle}>Your expert guide for sustainable dragon fruit farming</Text>
+        <Animated.View entering={FadeInDown.delay(400).duration(500)}>
+          <Text style={styles.subtitle}>{APP_SUBTAGLINE}</Text>
         </Animated.View>
 
         {/* Features */}
@@ -56,17 +58,12 @@ export default function WelcomeScreen() {
           {features.map((feature, index) => (
             <Animated.View
               key={feature.id}
-              entering={FadeInRight.delay(580 + index * 130).duration(450)}
+              entering={FadeInRight.delay(560 + index * 130).duration(450)}
               style={styles.featureItem}
             >
-              <LinearGradient
-                colors={["#25d366", Colors.agribot.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.featureNumber}
-              >
-                <Text style={styles.featureNumberText}>{feature.id}</Text>
-              </LinearGradient>
+              <View style={styles.featureEmojiBox}>
+                <Text style={styles.featureEmoji}>{feature.emoji}</Text>
+              </View>
               <View style={styles.featureContent}>
                 <Text style={styles.featureTitle}>{feature.title}</Text>
                 <Text style={styles.featureDescription}>{feature.description}</Text>
@@ -76,18 +73,18 @@ export default function WelcomeScreen() {
         </View>
 
         {/* Buttons */}
-        <Animated.View entering={FadeInUp.delay(1020).duration(500)} style={styles.buttonsContainer}>
+        <Animated.View entering={FadeInUp.delay(1000).duration(500)} style={styles.buttonsContainer}>
           <Pressable
             style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
             onPress={() => router.push("/auth/signup")}
           >
             <LinearGradient
-              colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+              colors={Colors.brand.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.primaryButton}
             >
-              <Text style={styles.primaryButtonText}>Get Started</Text>
+              <Text style={styles.primaryButtonText}>Tara, magsimula!</Text>
               <Text style={styles.arrowIcon}>→</Text>
             </LinearGradient>
           </Pressable>
@@ -96,52 +93,37 @@ export default function WelcomeScreen() {
             style={({ pressed }) => [styles.secondaryButton, { opacity: pressed ? 0.85 : 1 }]}
             onPress={() => router.push("/auth/login")}
           >
-            <Text style={styles.secondaryButtonText}>I Already Have an Account</Text>
+            <Text style={styles.secondaryButtonText}>May account na ako</Text>
           </Pressable>
         </Animated.View>
-
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F0F8F5",
-  },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
-  },
-  logoContainer: {
-    alignItems: "center",
-    marginBottom: 32,
-  },
+  container: { flex: 1, backgroundColor: Colors.ui.backgroundAlt },
+  scrollContent: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 40 },
+  logoContainer: { alignItems: "center", marginBottom: 28 },
   logoBox: {
-    width: 140,
-    height: 140,
-    backgroundColor: "white",
-    borderRadius: 32,
+    width: 130,
+    height: 130,
+    borderRadius: 34,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowColor: Colors.brand.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 8,
   },
-  logoImage: {
-    width: 100,
-    height: 100,
-  },
+  logoEmoji: { fontSize: 70 },
   title: {
-    fontSize: 32,
-    fontWeight: "800",
+    fontSize: 38,
+    fontWeight: "900",
     color: "#1A1A1A",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 10,
     letterSpacing: -0.5,
   },
   subtitle: {
@@ -152,84 +134,47 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     lineHeight: 24,
   },
-  featuresContainer: {
-    gap: 24,
-    marginBottom: 40,
-  },
-  featureItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 16,
-  },
-  featureNumber: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  featuresContainer: { gap: 20, marginBottom: 40 },
+  featureItem: { flexDirection: "row", alignItems: "center", gap: 16 },
+  featureEmojiBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: Colors.brand.tintSoft,
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
   },
-  featureNumberText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "white",
-  },
-  featureContent: {
-    flex: 1,
-    paddingTop: 4,
-  },
-  featureTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#1A1A1A",
-    marginBottom: 4,
-  },
-  featureDescription: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#666666",
-    lineHeight: 20,
-  },
-  buttonsContainer: {
-    gap: 12,
-  },
+  featureEmoji: { fontSize: 28 },
+  featureContent: { flex: 1 },
+  featureTitle: { fontSize: 17, fontWeight: "700", color: "#1A1A1A", marginBottom: 3 },
+  featureDescription: { fontSize: 14, fontWeight: "400", color: "#666666", lineHeight: 20 },
+  buttonsContainer: { gap: 12 },
   primaryButton: {
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 8,
-    shadowColor: Colors.agribot.primary,
+    shadowColor: Colors.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
-  primaryButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  arrowIcon: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
+  primaryButtonText: { color: "white", fontSize: 17, fontWeight: "800" },
+  arrowIcon: { color: "white", fontSize: 18, fontWeight: "700" },
   secondaryButton: {
     backgroundColor: "white",
     paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1.5,
-    borderColor: Colors.agribot.primary,
+    borderColor: Colors.brand.primary,
   },
-  secondaryButtonText: {
-    color: Colors.agribot.primary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  secondaryButtonText: { color: Colors.brand.primary, fontSize: 16, fontWeight: "700" },
 });

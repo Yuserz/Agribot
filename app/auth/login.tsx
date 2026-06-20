@@ -63,8 +63,8 @@ export default function LoginScreen() {
 
         {/* Title */}
         <Animated.View entering={FadeInDown.delay(100).duration(450)}>
-          <Text style={styles.title}>Welcome Back!</Text>
-          <Text style={styles.subtitle}>Sign in to continue to AgriBot</Text>
+          <Text style={styles.title}>Welcome Back, Bes!</Text>
+          <Text style={styles.subtitle}>Sign in and let&apos;s grow something</Text>
         </Animated.View>
 
         {/* Email */}
@@ -110,7 +110,6 @@ export default function LoginScreen() {
               onValueChange={setRememberMe}
               trackColor={{ false: "#e0e0e0", true: Colors.agribot.primary }}
               thumbColor={rememberMe ? "white" : "#f0f0f0"}
-              style={styles.checkbox}
             />
             <Text style={styles.checkboxLabel}>Remember me</Text>
           </View>
@@ -133,7 +132,7 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+              colors={Colors.agribot.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.loginButton}
@@ -190,7 +189,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   checkboxContainer: { flexDirection: "row", alignItems: "center", gap: 8 },
-  checkbox: { width: 18, height: 18 },
   checkboxLabel: { fontSize: 14, fontWeight: "400", color: "#666" },
   forgotPasswordLink: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
   loginButton: {

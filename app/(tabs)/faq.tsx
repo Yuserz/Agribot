@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/theme";
+import { useLanguage } from "@/context/language";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useMemo, useState } from "react";
@@ -15,9 +16,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FAQItem {
   id: string;
-  question: string;
-  answer: string;
   category: string;
+  question: string;
+  questionEn: string;
+  answer: string;
 }
 
 interface FAQCategory {
@@ -29,62 +31,70 @@ const faqData: FAQItem[] = [
   {
     id: "1",
     category: "Getting Started",
-    question: "What climate is best for dragon fruit?",
+    question: "Saan ako magsisimula bilang baguhan?",
+    questionEn: "Where do I start as a beginner?",
     answer:
-      "Dragon fruit thrives in warm, tropical and subtropical climates. It prefers temperatures between 24-29°C (75-84°F) and needs protection from frost.",
+      "Start with one easy, forgiving plant like kangkong, herbs, or succulents. Use a pot with drainage holes, good potting mix, and place it where it gets the right amount of light. Master one plant before adding more.",
   },
   {
     id: "2",
     category: "Getting Started",
-    question: "How do I start growing dragon fruit?",
+    question: "Seeds ba o seedlings ang mas madali?",
+    questionEn: "Are seeds or seedlings easier to use?",
     answer:
-      "Start by obtaining healthy cuttings or seeds from reputable sources. Plant in well-draining soil with plenty of organic matter. Provide support structures like trellises and ensure the location gets 6+ hours of sunlight daily.",
+      "Seedlings (already-sprouted plants) are easier and faster for beginners. Seeds are cheaper and more rewarding but need more patience and care. Many gulay like kamatis and sili are also easy to grow from kitchen scraps.",
   },
   {
     id: "3",
     category: "Watering",
-    question: "How often should I water dragon fruit?",
+    question: "Gaano kadalas dapat magdilig?",
+    questionEn: "How often should I water my plants?",
     answer:
-      "Water dragon fruit when the top inch of soil feels dry, typically 2-3 times per week during growing season. Reduce frequency during winter. Ensure soil drains well to prevent waterlogging.",
+      "Check the soil first — stick a finger about 2-3 cm deep. If it's dry, water; if it's still moist, wait. Most plants prefer a deep soak when dry over a little water every day.",
   },
   {
     id: "4",
     category: "Watering",
-    question: "What are signs of overwatering?",
+    question: "Ano ang signs ng sobrang tubig?",
+    questionEn: "What are the signs of overwatering?",
     answer:
-      "Signs of overwatering include yellow leaves, root rot, mold on soil, and soft stems. Reduce watering frequency and improve soil drainage if you notice these symptoms.",
+      "Yellowing leaves, mushy stems, mold on the soil, and a sour smell usually mean overwatering. Let the soil dry out, improve drainage, and make sure the pot isn't sitting in standing water.",
   },
   {
     id: "5",
-    category: "Fertilization",
-    question: "What fertilizer should I use?",
+    category: "Sunlight & Soil",
+    question: "Magkano dapat ang sikat ng araw?",
+    questionEn: "How much sunlight do my plants need?",
     answer:
-      "Use a balanced fertilizer (NPK ratio like 10-10-10) during growing season. Switch to a phosphorus-rich fertilizer during flowering. Apply fertilizer every 4-6 weeks, or use slow-release fertilizers.",
+      "Most gulay and fruiting plants want 6+ hours of direct sun. Leafy greens and many indoor plants do fine with bright, indirect light. Observe your space for a day to find the sunniest spots.",
   },
   {
     id: "6",
     category: "Pest Control",
-    question: "How do I control pests organically?",
+    question: "Paano puksain ang peste nang natural?",
+    questionEn: "How do I get rid of pests naturally?",
     answer:
-      "Use neem oil, insecticidal soaps, or companion planting. Remove affected parts manually if possible. Maintain good plant health and hygiene. Consult AgriBot for specific pest issues.",
+      "Try neem oil, a mild soap-and-water spray, or hand-picking pests off leaves. Keep plants healthy and spaced for airflow, and remove affected leaves early. Ask the chatbot for the specific pest you're seeing.",
   },
   {
     id: "7",
     category: "Pest Control",
-    question: "What are common dragon fruit diseases?",
+    question: "Bakit naninilaw ang dahon?",
+    questionEn: "Why are my leaves turning yellow?",
     answer:
-      "Common diseases include anthracnose, leaf spot, and stem rot. Prevent by ensuring good air circulation, avoiding overhead watering, and maintaining proper hygiene.",
+      "Yellow leaves can mean overwatering, poor drainage, too little light, or nutrient deficiency. Check watering and light first — those are the most common causes. Describe it to the chatbot for a tailored fix.",
   },
 ];
 
-// Extracted as a proper component so it can use hooks for the chevron rotation
 function FAQItemRow({
   item,
   isExpanded,
+  isEnglish,
   onToggle,
 }: {
   item: FAQItem;
   isExpanded: boolean;
+  isEnglish: boolean;
   onToggle: () => void;
 }) {
   const rotation = useSharedValue(isExpanded ? 1 : 0);
@@ -101,7 +111,7 @@ function FAQItemRow({
     <View style={styles.faqItemContainer}>
       <Pressable onPress={onToggle} style={styles.faqHeader}>
         <View style={styles.faqHeaderContent}>
-          <Text style={styles.question}>{item.question}</Text>
+          <Text style={styles.question}>{isEnglish ? item.questionEn : item.question}</Text>
         </View>
         <Animated.View style={chevronStyle}>
           <MaterialCommunityIcons name="chevron-down" size={20} color={Colors.ui.textSecondary} />
@@ -122,6 +132,7 @@ function FAQItemRow({
 }
 
 export default function FAQScreen() {
+  const { isEnglish } = useLanguage();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -136,6 +147,7 @@ export default function FAQScreen() {
       filtered = faqData.filter(
         (item) =>
           item.question.toLowerCase().includes(query) ||
+          item.questionEn.toLowerCase().includes(query) ||
           item.answer.toLowerCase().includes(query),
       );
     }
@@ -160,6 +172,7 @@ export default function FAQScreen() {
             key={faqItem.id}
             item={faqItem}
             isExpanded={expandedId === faqItem.id}
+            isEnglish={isEnglish}
             onToggle={() => toggleExpanded(faqItem.id)}
           />
         ))}
@@ -171,12 +184,14 @@ export default function FAQScreen() {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <Animated.View entering={FadeIn.duration(400)}>
         <LinearGradient
-          colors={["#25d366", Colors.agribot.primary, Colors.agribot.dark]}
+          colors={Colors.agribot.gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.headerSection}
         >
-          <Text style={styles.headerTitle}>Frequently Asked Questions</Text>
+          <Text style={styles.headerTitle}>
+            {isEnglish ? "Frequently Asked Questions 🌿" : "Mga Madalas Itanong 🌿"}
+          </Text>
           <View style={styles.searchBar}>
             <MaterialCommunityIcons
               name="magnify"
@@ -186,7 +201,7 @@ export default function FAQScreen() {
             />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search FAQs..."
+              placeholder={isEnglish ? "Search questions..." : "Maghanap ng tanong..."}
               placeholderTextColor={Colors.ui.textMuted}
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -252,11 +267,11 @@ const styles = StyleSheet.create({
   faqHeaderContent: { flex: 1, marginRight: 12 },
   question: { flex: 1, fontSize: 15, fontWeight: "600", color: Colors.ui.textPrimary, lineHeight: 20 },
   answerContainer: {
-    backgroundColor: "rgba(29, 184, 84, 0.08)",
+    backgroundColor: Colors.brand.tintSoft,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: "rgba(29, 184, 84, 0.15)",
+    borderTopColor: Colors.brand.tintSoftBorder,
   },
   answer: { fontSize: 14, color: Colors.ui.textSecondary, lineHeight: 22 },
 });
