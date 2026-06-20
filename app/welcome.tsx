@@ -1,5 +1,8 @@
 import { APP_NAME, APP_SUBTAGLINE } from "@/constants/brand";
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
+import { useLanguage } from "@/context/language";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -27,6 +30,13 @@ const features: FeatureItem[] = [
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { continueAsGuest } = useAuth();
+  const { isEnglish } = useLanguage();
+
+  const handleGuest = async () => {
+    await continueAsGuest();
+    router.replace("/(tabs)");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,6 +104,24 @@ export default function WelcomeScreen() {
             onPress={() => router.push("/auth/login")}
           >
             <Text style={styles.secondaryButtonText}>May account na ako</Text>
+          </Pressable>
+
+          {/* Divider */}
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>{isEnglish ? "or" : "o kaya"}</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Continue as guest */}
+          <Pressable
+            style={({ pressed }) => [styles.guestButton, { opacity: pressed ? 0.6 : 1 }]}
+            onPress={handleGuest}
+          >
+            <MaterialCommunityIcons name="account-arrow-right-outline" size={20} color={Colors.brand.primary} />
+            <Text style={styles.guestButtonText}>
+              {isEnglish ? "Continue as guest" : "Tingnan muna bilang guest"}
+            </Text>
           </Pressable>
         </Animated.View>
       </ScrollView>
@@ -177,4 +205,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.brand.primary,
   },
   secondaryButtonText: { color: Colors.brand.primary, fontSize: 16, fontWeight: "700" },
+  dividerRow: { flexDirection: "row", alignItems: "center", gap: 12, marginVertical: 4 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.ui.hairline },
+  dividerText: { fontSize: 13, fontWeight: "600", color: Colors.ui.textMuted },
+  guestButton: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 14,
+  },
+  guestButtonText: { color: Colors.brand.primary, fontSize: 15, fontWeight: "700" },
 });

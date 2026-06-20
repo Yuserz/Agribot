@@ -26,7 +26,7 @@ import Animated, { FadeIn, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, isGuest, signOut } = useAuth();
   const { isEnglish, toggleLanguage } = useLanguage();
   const router = useRouter();
   const [editNameVisible, setEditNameVisible] = useState(false);
@@ -144,7 +144,11 @@ export default function ProfileScreen() {
               entering={ZoomIn.delay(150).springify().damping(24).stiffness(200)}
               style={styles.avatarContainer}
             >
-              <Pressable onPress={handlePickAvatar} style={styles.avatarWrapper}>
+              <Pressable
+                onPress={isGuest ? undefined : handlePickAvatar}
+                disabled={isGuest}
+                style={styles.avatarWrapper}
+              >
                 {uploadingAvatar ? (
                   <View style={styles.avatarCircle}>
                     <ActivityIndicator color={Colors.brand.primary} size="large" />
@@ -160,41 +164,55 @@ export default function ProfileScreen() {
                     <MaterialCommunityIcons name="account" size={60} color={Colors.brand.primary} />
                   </View>
                 )}
-                <View style={styles.editAvatarBadge}>
-                  <MaterialCommunityIcons name="camera" size={13} color="white" />
-                </View>
+                {!isGuest && (
+                  <View style={styles.editAvatarBadge}>
+                    <MaterialCommunityIcons name="camera" size={13} color="white" />
+                  </View>
+                )}
               </Pressable>
             </Animated.View>
 
             {/* Name + edit */}
             <Animated.View entering={FadeInUp.delay(250).duration(400)} style={styles.nameRow}>
-              <Text style={styles.profileName}>{displayName}</Text>
-              <Pressable onPress={openEditName} hitSlop={10} style={styles.editNameBtn}>
-                <MaterialCommunityIcons name="pencil" size={16} color="rgba(255,255,255,0.85)" />
-              </Pressable>
+              <Text style={styles.profileName}>
+                {isGuest ? (isEnglish ? "Guest" : "Bisita") : displayName}
+              </Text>
+              {!isGuest && (
+                <Pressable onPress={openEditName} hitSlop={10} style={styles.editNameBtn}>
+                  <MaterialCommunityIcons name="pencil" size={16} color="rgba(255,255,255,0.85)" />
+                </Pressable>
+              )}
             </Animated.View>
-            <Text style={styles.profileEmail}>{displayEmail}</Text>
+            <Text style={styles.profileEmail}>
+              {isGuest
+                ? isEnglish
+                  ? "Browsing as a guest"
+                  : "Naka-guest mode ka muna"
+                : displayEmail}
+            </Text>
           </LinearGradient>
         </Animated.View>
 
         {/* Account Actions */}
         <Animated.View entering={FadeInUp.delay(300).duration(400)} style={styles.menuContainer}>
-          <Pressable
-            style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
-            onPress={openEditName}
-          >
-            <View style={styles.iconBackground}>
-              <MaterialCommunityIcons name="account-edit" size={22} color={Colors.brand.primary} />
-            </View>
-            <View style={styles.menuItemContent}>
-              <Text style={styles.menuLabel}>Edit Name</Text>
-              <Text style={styles.menuDescription}>Update your display name</Text>
-            </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
-          </Pressable>
+          {!isGuest && (
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, pressed && styles.menuItemPressed]}
+              onPress={openEditName}
+            >
+              <View style={styles.iconBackground}>
+                <MaterialCommunityIcons name="account-edit" size={22} color={Colors.brand.primary} />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={styles.menuLabel}>Edit Name</Text>
+                <Text style={styles.menuDescription}>Update your display name</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
+            </Pressable>
+          )}
 
           {/* Language toggle */}
-          <View style={styles.menuItem}>
+          <View style={[styles.menuItem, isGuest && styles.menuItemLast]}>
             <View style={styles.iconBackground}>
               <MaterialCommunityIcons name="translate" size={22} color={Colors.brand.primary} />
             </View>
@@ -212,19 +230,21 @@ export default function ProfileScreen() {
             />
           </View>
 
-          <Pressable
-            style={({ pressed }) => [styles.menuItem, styles.menuItemLast, pressed && styles.menuItemPressedDanger]}
-            onPress={handleDeleteAccount}
-          >
-            <View style={[styles.iconBackground, styles.dangerIconBg]}>
-              <MaterialCommunityIcons name="account-remove" size={22} color="#e53e3e" />
-            </View>
-            <View style={styles.menuItemContent}>
-              <Text style={[styles.menuLabel, styles.dangerLabel]}>Delete Account</Text>
-              <Text style={styles.menuDescription}>Permanently remove your account</Text>
-            </View>
-            <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
-          </Pressable>
+          {!isGuest && (
+            <Pressable
+              style={({ pressed }) => [styles.menuItem, styles.menuItemLast, pressed && styles.menuItemPressedDanger]}
+              onPress={handleDeleteAccount}
+            >
+              <View style={[styles.iconBackground, styles.dangerIconBg]}>
+                <MaterialCommunityIcons name="account-remove" size={22} color="#e53e3e" />
+              </View>
+              <View style={styles.menuItemContent}>
+                <Text style={[styles.menuLabel, styles.dangerLabel]}>Delete Account</Text>
+                <Text style={styles.menuDescription}>Permanently remove your account</Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={24} color={Colors.ui.textMuted} />
+            </Pressable>
+          )}
         </Animated.View>
 
         {/* About */}
@@ -236,15 +256,34 @@ export default function ProfileScreen() {
           </View>
         </Animated.View>
 
-        {/* Logout */}
+        {/* Logout / Sign-in CTA */}
         <Animated.View entering={FadeIn.delay(480).duration(400)} style={styles.logoutWrapper}>
-          <Pressable
-            style={({ pressed }) => [styles.logoutButton, { opacity: pressed ? 0.8 : 1 }]}
-            onPress={handleLogout}
-          >
-            <MaterialCommunityIcons name="logout" size={20} color="#e53e3e" />
-            <Text style={styles.logoutText}>Log Out</Text>
-          </Pressable>
+          {isGuest ? (
+            <Pressable
+              style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
+              onPress={handleLogout}
+            >
+              <LinearGradient
+                colors={Colors.brand.gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.signInButton}
+              >
+                <MaterialCommunityIcons name="login" size={20} color="white" />
+                <Text style={styles.signInText}>
+                  {isEnglish ? "Log In or Sign Up" : "Mag-log in o mag-sign up"}
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={({ pressed }) => [styles.logoutButton, { opacity: pressed ? 0.8 : 1 }]}
+              onPress={handleLogout}
+            >
+              <MaterialCommunityIcons name="logout" size={20} color="#e53e3e" />
+              <Text style={styles.logoutText}>Log Out</Text>
+            </Pressable>
+          )}
         </Animated.View>
 
       </ScrollView>
@@ -418,6 +457,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoutText: { fontSize: 16, fontWeight: "600", color: "#e53e3e" },
+  signInButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 15,
+    borderRadius: 12,
+    gap: 8,
+    shadowColor: Colors.brand.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  signInText: { fontSize: 16, fontWeight: "700", color: "white" },
 
   // Modal
   modalOverlay: {

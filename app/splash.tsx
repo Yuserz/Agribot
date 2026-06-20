@@ -9,7 +9,7 @@ import { useAuth } from "@/context/auth";
 
 export default function SplashScreen() {
   const router = useRouter();
-  const { session, loading } = useAuth();
+  const { session, isGuest, loading } = useAuth();
 
   const logoScale = useRef(new Animated.Value(0.5)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -46,12 +46,12 @@ export default function SplashScreen() {
 
     const timer = setTimeout(() => {
       if (!loading) {
-        router.replace(session ? "/(tabs)" : "/welcome");
+        router.replace(session || isGuest ? "/(tabs)" : "/welcome");
       }
     }, 2800);
 
     return () => clearTimeout(timer);
-  }, [loading, session]);
+  }, [loading, session, isGuest]);
 
   return (
     <LinearGradient

@@ -59,7 +59,7 @@ function toChatMessage(msg: BotpressMessage, userId: string): ChatMessage {
 }
 
 export function BotpressProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -107,7 +107,9 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (!user) {
+    // Chat is available to authenticated users and guests alike — the Botpress
+    // session is keyed off its own AsyncStorage id, independent of Supabase auth.
+    if (!user && !isGuest) {
       sessionRef.current = null;
       setMessages([]);
       setIsInitializing(true);
@@ -150,7 +152,7 @@ export function BotpressProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [user, doSend, sessionKey]);
+  }, [user, isGuest, doSend, sessionKey]);
 
   const sendMessage = useCallback(
     async (text: string) => {
