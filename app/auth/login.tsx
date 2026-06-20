@@ -108,7 +108,7 @@ export default function LoginScreen() {
             <Switch
               value={rememberMe}
               onValueChange={setRememberMe}
-              trackColor={{ false: "#e0e0e0", true: Colors.agribot.primary }}
+              trackColor={{ false: "#e0e0e0", true: Colors.brand.primary }}
               thumbColor={rememberMe ? "white" : "#f0f0f0"}
             />
             <Text style={styles.checkboxLabel}>Remember me</Text>
@@ -132,7 +132,7 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={Colors.agribot.gradient}
+              colors={Colors.brand.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.loginButton}
@@ -190,14 +190,14 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: { flexDirection: "row", alignItems: "center", gap: 8 },
   checkboxLabel: { fontSize: 14, fontWeight: "400", color: "#666" },
-  forgotPasswordLink: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+  forgotPasswordLink: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },
   loginButton: {
     paddingVertical: 16,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 24,
-    shadowColor: Colors.agribot.primary,
+    shadowColor: Colors.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -206,6 +206,6 @@ const styles = StyleSheet.create({
   loginButtonText: { color: "white", fontSize: 18, fontWeight: "600" },
   signUpContainer: { flexDirection: "row", justifyContent: "center", alignItems: "center" },
   signUpText: { fontSize: 14, fontWeight: "400", color: "#666" },
-  signUpLink: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+  signUpLink: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },
   errorText: { fontSize: 14, color: "#e53e3e", marginBottom: 12, textAlign: "center" },
 });

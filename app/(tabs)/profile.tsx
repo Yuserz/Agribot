@@ -134,7 +134,7 @@ export default function ProfileScreen() {
         {/* Profile Header */}
         <Animated.View entering={FadeIn.duration(400)}>
           <LinearGradient
-            colors={Colors.agribot.gradient}
+            colors={Colors.brand.gradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.profileHeader}
@@ -147,7 +147,7 @@ export default function ProfileScreen() {
               <Pressable onPress={handlePickAvatar} style={styles.avatarWrapper}>
                 {uploadingAvatar ? (
                   <View style={styles.avatarCircle}>
-                    <ActivityIndicator color={Colors.agribot.primary} size="large" />
+                    <ActivityIndicator color={Colors.brand.primary} size="large" />
                   </View>
                 ) : avatarUrl ? (
                   <Image
@@ -157,7 +157,7 @@ export default function ProfileScreen() {
                   />
                 ) : (
                   <View style={styles.avatarCircle}>
-                    <MaterialCommunityIcons name="account" size={60} color={Colors.agribot.primary} />
+                    <MaterialCommunityIcons name="account" size={60} color={Colors.brand.primary} />
                   </View>
                 )}
                 <View style={styles.editAvatarBadge}>
@@ -184,7 +184,7 @@ export default function ProfileScreen() {
             onPress={openEditName}
           >
             <View style={styles.iconBackground}>
-              <MaterialCommunityIcons name="account-edit" size={22} color={Colors.agribot.primary} />
+              <MaterialCommunityIcons name="account-edit" size={22} color={Colors.brand.primary} />
             </View>
             <View style={styles.menuItemContent}>
               <Text style={styles.menuLabel}>Edit Name</Text>
@@ -196,7 +196,7 @@ export default function ProfileScreen() {
           {/* Language toggle */}
           <View style={styles.menuItem}>
             <View style={styles.iconBackground}>
-              <MaterialCommunityIcons name="translate" size={22} color={Colors.agribot.primary} />
+              <MaterialCommunityIcons name="translate" size={22} color={Colors.brand.primary} />
             </View>
             <View style={styles.menuItemContent}>
               <Text style={styles.menuLabel}>Full English</Text>
@@ -207,7 +207,7 @@ export default function ProfileScreen() {
             <Switch
               value={isEnglish}
               onValueChange={toggleLanguage}
-              trackColor={{ false: "#e0e0e0", true: Colors.agribot.primary }}
+              trackColor={{ false: "#e0e0e0", true: Colors.brand.primary }}
               thumbColor="white"
             />
           </View>
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: Colors.agribot.primary,
+    backgroundColor: Colors.brand.primary,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   aboutTitle: { fontSize: 15, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 12 },
   aboutContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   aboutLabel: { fontSize: 14, color: Colors.ui.textSecondary },
-  aboutValue: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+  aboutValue: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },
 
   // Logout
   logoutWrapper: {
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 13,
     borderRadius: 10,
-    backgroundColor: Colors.agribot.primary,
+    backgroundColor: Colors.brand.primary,
     alignItems: "center",
   },
   modalSaveDisabled: { opacity: 0.45 },

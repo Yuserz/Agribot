@@ -184,7 +184,7 @@ export default function FAQScreen() {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <Animated.View entering={FadeIn.duration(400)}>
         <LinearGradient
-          colors={Colors.agribot.gradient}
+          colors={Colors.brand.gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.headerSection}

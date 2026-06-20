@@ -170,7 +170,7 @@ export default function SignUpScreen() {
           <Switch
             value={agreedToTerms}
             onValueChange={setAgreedToTerms}
-            trackColor={{ false: "#e0e0e0", true: Colors.agribot.primary }}
+            trackColor={{ false: "#e0e0e0", true: Colors.brand.primary }}
             thumbColor={agreedToTerms ? "white" : "#f0f0f0"}
           />
           <View style={styles.termsText}>
@@ -195,7 +195,7 @@ export default function SignUpScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={Colors.agribot.gradient}
+              colors={Colors.brand.gradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.signUpButton}
@@ -248,14 +248,14 @@ const styles = StyleSheet.create({
   termsContainer: { flexDirection: "row", alignItems: "flex-start", marginBottom: 24, gap: 8 },
   termsText: { flex: 1, flexDirection: "row", flexWrap: "wrap" },
   termsLabel: { fontSize: 14, fontWeight: "400", color: "#666" },
-  termsLink: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+  termsLink: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },
   signUpButton: {
     paddingVertical: 16,
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 24,
-    shadowColor: Colors.agribot.primary,
+    shadowColor: Colors.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -264,6 +264,6 @@ const styles = StyleSheet.create({
   signUpButtonText: { color: "white", fontSize: 18, fontWeight: "600" },
   loginContainer: { flexDirection: "row", justifyContent: "center", alignItems: "center" },
   loginText: { fontSize: 14, fontWeight: "400", color: "#666" },
-  loginLink: { fontSize: 14, fontWeight: "600", color: Colors.agribot.primary },
+  loginLink: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },
   errorText: { fontSize: 14, color: "#e53e3e", marginBottom: 12, textAlign: "center" },
 });

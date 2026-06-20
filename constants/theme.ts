@@ -4,7 +4,6 @@
  * Brand identity: "Tanim, Bes!" — a premium botanical theme.
  * Deep emerald + champagne gold over warm ivory neutrals.
  * Use the `Colors.brand.*` and `Colors.ui.*` tokens instead of hardcoding hex.
- * `Colors.agribot` is kept as an alias of `Colors.brand` for backwards compatibility.
  */
 
 import { Platform } from "react-native";
@@ -49,8 +48,6 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   brand,
-  // Alias kept so existing screens referencing Colors.agribot keep working
-  agribot: brand,
   ui: {
     // General UI colors
     white: "#ffffff",

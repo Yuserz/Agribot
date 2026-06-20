@@ -1,29 +1,38 @@
-# AgriBot 🤖🌾
+# Tanim, Bes! 🌱
 
-AgriBot is a mobile application built with [Expo](https://expo.dev) that provides intelligent agricultural solutions and assistance about Dragon Fruit Farming. This app leverages modern technology to help farmers and agricultural professionals with real-time chatbot support, frequently asked questions, user authentication, and comprehensive profile management.
+**Tanim, Bes!** is a mobile application built with [Expo](https://expo.dev) — a friendly, general plant-care assistant for *any* plant, with a Taglish/Gen Z tone. It pairs Supabase email/password authentication with a Botpress-backed chat assistant to help you plan, grow, and care for your halaman.
 
-## About AgriBot
+## About Tanim, Bes!
 
-AgriBot is designed to bridge the gap between technology and agriculture by offering:
+Tanim, Bes! makes plant care approachable for everyone by offering:
 
-- **AI-powered Chatbot**: Get instant answers to your agricultural queries
-- **Frequently Asked Questions (FAQ)**: Quick access to common agricultural knowledge
-- **User Authentication**: Secure login and signup functionality
-- **User Profiles**: Manage your account and preferences
+- **AI-powered Chatbot**: Ask anything about any plant and get instant, friendly answers
+- **Quick-access Plant Topics**: Tap a plant or care action on the Home screen to jump straight into a chat
+- **Frequently Asked Questions (FAQ)**: Common plant-care knowledge at a glance
+- **Bilingual UI**: Taglish by default, with a one-tap toggle to full English
+- **User Authentication**: Secure login and signup via Supabase
+- **User Profiles**: Edit your name, upload an avatar, and manage your account
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app), providing a cross-platform experience for Android, iOS, and web.
+Cross-platform for Android, iOS, and web.
 
 ## Prerequisites
 
 Before running this app, ensure you have the following installed:
-
-### Required
 
 - **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
 - **pnpm** (v8 or higher) - Install globally using:
   ```bash
   npm install -g pnpm
   ```
+
+## Required environment
+
+Create a `.env.local` with your Supabase credentials (must be `EXPO_PUBLIC_`-prefixed to reach the client bundle):
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=your-supabase-url
+EXPO_PUBLIC_SUPABASE_KEY=your-supabase-anon-key
+```
 
 ## Get started
 
@@ -36,7 +45,7 @@ Before running this app, ensure you have the following installed:
 2. Start the app
 
    ```bash
-   npx expo start
+   pnpm expo start
    ```
 
 In the output, you'll find options to open the app in a

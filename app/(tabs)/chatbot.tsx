@@ -195,7 +195,7 @@ export default function ChatbotScreen() {
                   <MaterialCommunityIcons
                     name={isSpeaking ? "volume-high" : "volume-medium"}
                     size={15}
-                    color={isSpeaking ? Colors.agribot.primary : Colors.ui.textMuted}
+                    color={isSpeaking ? Colors.brand.primary : Colors.ui.textMuted}
                   />
                 </Pressable>
               </View>
@@ -256,7 +256,7 @@ export default function ChatbotScreen() {
             <MaterialCommunityIcons
               name={ttsEnabled ? "volume-high" : "volume-off"}
               size={22}
-              color={ttsEnabled ? Colors.agribot.primary : Colors.ui.textSecondary}
+              color={ttsEnabled ? Colors.brand.primary : Colors.ui.textSecondary}
             />
           </Pressable>
           <Pressable onPress={handleNewConversation} style={styles.headerButton} hitSlop={8}>
@@ -325,15 +325,15 @@ const markdownStyles = {
   bullet_list: { marginBottom: 4 },
   ordered_list: { marginBottom: 4 },
   list_item: { marginBottom: 2 },
-  bullet_list_icon: { color: Colors.agribot.primary, marginTop: 4 },
-  ordered_list_icon: { color: Colors.agribot.primary },
+  bullet_list_icon: { color: Colors.brand.primary, marginTop: 4 },
+  ordered_list_icon: { color: Colors.brand.primary },
   code_inline: {
     backgroundColor: "#f0f0f0",
     borderRadius: 4,
     paddingHorizontal: 4,
     fontSize: 13,
     fontFamily: "monospace",
-    color: Colors.agribot.dark,
+    color: Colors.brand.dark,
   },
   fence: {
     backgroundColor: "#f0f0f0",
@@ -346,14 +346,14 @@ const markdownStyles = {
   },
   blockquote: {
     borderLeftWidth: 3,
-    borderLeftColor: Colors.agribot.primary,
+    borderLeftColor: Colors.brand.primary,
     paddingLeft: 10,
     marginLeft: 0,
     marginVertical: 4,
     opacity: 0.85,
   },
   hr: { backgroundColor: "#e0e0e0", height: 1, marginVertical: 8 },
-  link: { color: Colors.agribot.primary },
+  link: { color: Colors.brand.primary },
 };
 
 const styles = StyleSheet.create({
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.agribot.primary,
+    backgroundColor: Colors.brand.primary,
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
@@ -415,21 +415,21 @@ const styles = StyleSheet.create({
   messageFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
   speakButton: { padding: 2 },
   userMessageContainer: { flexDirection: "row", justifyContent: "flex-end", marginBottom: 16 },
-  userMessage: { backgroundColor: Colors.agribot.primary, maxWidth: "80%" },
+  userMessage: { backgroundColor: Colors.brand.primary, maxWidth: "80%" },
   userMessageText: { fontSize: 14, lineHeight: 20, color: Colors.ui.white },
   timestamp: { fontSize: 11, color: Colors.ui.textMuted },
   userTimestamp: { fontSize: 11, color: "rgba(255,255,255,0.65)", marginTop: 4, alignSelf: "flex-end" },
   choicesContainer: { marginTop: 8, gap: 8 },
   choiceButton: {
     borderWidth: 1.5,
-    borderColor: Colors.agribot.primary,
+    borderColor: Colors.brand.primary,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
     alignSelf: "flex-start",
   },
   choiceButtonPressed: { backgroundColor: Colors.brand.tintSoft },
-  choiceButtonText: { fontSize: 14, color: Colors.agribot.primary, fontWeight: "500" },
+  choiceButtonText: { fontSize: 14, color: Colors.brand.primary, fontWeight: "500" },
   loadingContainer: {
     paddingHorizontal: 16,
     paddingBottom: 12,
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   typingDots: { flexDirection: "row", gap: 4, alignItems: "center" },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.agribot.primary },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.brand.primary },
   inputContainer: {
     flexDirection: "row",
     paddingHorizontal: 16,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.agribot.primary,
+    backgroundColor: Colors.brand.primary,
     justifyContent: "center",
     alignItems: "center",
   },
