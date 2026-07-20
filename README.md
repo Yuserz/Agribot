@@ -39,13 +39,13 @@ EXPO_PUBLIC_SUPABASE_KEY=your-supabase-anon-key
 1. Install dependencies
 
    ```bash
-   pnpm install
+   make install
    ```
 
 2. Start the app
 
    ```bash
-   pnpm expo start
+   make dev
    ```
 
 In the output, you'll find options to open the app in a
@@ -56,6 +56,23 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Make commands
+
+A `Makefile` wraps the common `pnpm` scripts so you can type less. Run `make help` to see them all.
+
+| Command        | What it does                                   | Wraps               |
+| -------------- | ---------------------------------------------- | ------------------- |
+| `make install` | Install dependencies                           | `pnpm install`      |
+| `make dev`     | Start the Expo dev server (alias for `start`)  | `pnpm start`        |
+| `make start`   | Start the Expo dev server                      | `pnpm start`        |
+| `make android` | Run on an Android emulator/device              | `pnpm android`      |
+| `make ios`     | Run on an iOS simulator/device                 | `pnpm ios`          |
+| `make web`     | Run in the browser                             | `pnpm web`          |
+| `make lint`    | Lint with ESLint                               | `pnpm lint`         |
+| `make clean`   | Clear the Expo/Metro cache and restart         | `pnpm start --clear`|
+| `make reset`   | Reset to a blank `app/` (destructive)          | `pnpm reset-project`|
+| `make help`    | List all available commands                    | —                   |
 
 ## Learn more
 
