@@ -21,22 +21,22 @@ const tips = [
     id: 1,
     icon: "sprout",
     bgColor: Colors.ui.tipBgGreen,
-    taglish: { title: "Start small, bes", description: "Pick one easy plant first (kangkong or herbs) before going big." },
-    english: { title: "Start small", description: "Pick one easy plant first before going big — kangkong and herbs are great starters." },
+    taglish: { title: "Patuyuin muna, bes", description: "Let cuttings callus for 5-7 days bago itanim para hindi mabulok." },
+    english: { title: "Let it callus first", description: "Dry new cuttings in the shade for 5-7 days before planting so they don't rot." },
   },
   {
     id: 2,
     icon: "water-percent",
     bgColor: Colors.ui.tipBgBlue,
-    taglish: { title: "Don't drown them", description: "Most plants die from too much water, not too little." },
-    english: { title: "Don't drown them", description: "Most plants die from too much water, not too little." },
+    taglish: { title: "Cactus 'yan, bes", description: "Diligan lang kapag tuyo na ang lupa — ayaw niya ng basang ugat." },
+    english: { title: "It's a cactus", description: "Water only when the soil is dry — dragon fruit hates soggy roots." },
   },
   {
     id: 3,
-    icon: "white-balance-sunny",
+    icon: "weather-night",
     bgColor: Colors.ui.tipBgYellow,
-    taglish: { title: "Chase the sun", description: "Know your plant's light needs — full sun vs. shade matters." },
-    english: { title: "Chase the sun", description: "Know your plant's light needs — full sun vs. shade makes a big difference." },
+    taglish: { title: "Night shift ang bulaklak", description: "Isang gabi lang bukas ang bulaklak — hand-pollinate before sunrise." },
+    english: { title: "Flowers bloom at night", description: "Each flower opens for one night only — hand-pollinate before sunrise." },
   },
 ];
 
@@ -45,7 +45,7 @@ export default function HomeScreen() {
   const { setPendingMessage } = useBotpress();
   const { isEnglish } = useLanguage();
   const router = useRouter();
-  const displayName = getDisplayName(user, isEnglish ? "friend" : "ka-tanim");
+  const displayName = getDisplayName(user, isEnglish ? "friend" : "ka-farmer");
   const lang = isEnglish ? "english" : "taglish";
 
   const ask = (message: string) => {
@@ -72,7 +72,7 @@ export default function HomeScreen() {
           >
             <Text style={styles.brandTag}>{APP_NAME}</Text>
             <Text style={styles.greeting}>{isEnglish ? `Hey, ${displayName}! 👋` : greetingFor(displayName)}</Text>
-            <Text style={styles.subGreeting}>{isEnglish ? "What are we planting today?" : "Anong itatanim natin ngayon?"}</Text>
+            <Text style={styles.subGreeting}>{isEnglish ? "How's your dragon fruit today?" : "Kumusta ang dragon fruit mo today?"}</Text>
           </LinearGradient>
         </Animated.View>
 
@@ -82,7 +82,7 @@ export default function HomeScreen() {
           style={styles.section}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>{isEnglish ? "Plants 🌱" : "Mga Halaman 🌱"}</Text>
+            <Text style={styles.sectionTitle}>{isEnglish ? "Dragon Fruit Topics 🐉" : "Dragon Fruit Topics 🐉"}</Text>
             <Text style={styles.sectionHint}>Tap to ask</Text>
           </View>
           <View style={styles.topicsGrid}>
@@ -101,7 +101,7 @@ export default function HomeScreen() {
                   ]}
                 >
                   <Text style={styles.topicEmoji}>{topic.emoji}</Text>
-                  <Text style={[styles.topicName, { color: topic.color }]} numberOfLines={1}>
+                  <Text style={[styles.topicName, { color: topic.color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
                     {topic.name}
                   </Text>
                 </Pressable>
@@ -159,7 +159,7 @@ export default function HomeScreen() {
               </View>
               <View style={styles.ctaTextWrap}>
                 <Text style={styles.ctaTitle}>{isEnglish ? "Not on the list? Just ask!" : "Wala sa list? Itanong mo!"}</Text>
-                <Text style={styles.ctaSub}>Chat about any plant, any question.</Text>
+                <Text style={styles.ctaSub}>Chat about anything dragon fruit.</Text>
               </View>
               <View style={styles.ctaArrow}>
                 <MaterialCommunityIcons name="arrow-right" size={20} color={Colors.brand.dark} />

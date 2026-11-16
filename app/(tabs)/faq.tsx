@@ -31,58 +31,58 @@ const faqData: FAQItem[] = [
   {
     id: "1",
     category: "Getting Started",
-    question: "Saan ako magsisimula bilang baguhan?",
-    questionEn: "Where do I start as a beginner?",
+    question: "Paano pa-ugatin ang dragon fruit cutting?",
+    questionEn: "How do I root a dragon fruit cutting?",
     answer:
-      "Start with one easy, forgiving plant like kangkong, herbs, or succulents. Use a pot with drainage holes, good potting mix, and place it where it gets the right amount of light. Master one plant before adding more.",
+      "Cut a healthy 30-50 cm stem segment and let the cut end dry and callus in the shade for 5-7 days. Plant it about 5 cm deep in well-draining soil (garden soil mixed with sand or compost), water lightly, and keep it in bright shade. Roots usually form in 3-4 weeks — don't overwater while waiting.",
   },
   {
     id: "2",
     category: "Getting Started",
-    question: "Seeds ba o seedlings ang mas madali?",
-    questionEn: "Are seeds or seedlings easier to use?",
+    question: "Bakit hindi namumunga ang dragon fruit ko?",
+    questionEn: "Why isn't my dragon fruit plant fruiting?",
     answer:
-      "Seedlings (already-sprouted plants) are easier and faster for beginners. Seeds are cheaper and more rewarding but need more patience and care. Many gulay like kamatis and sili are also easy to grow from kitchen scraps.",
+      "Most plants fruit only after 12-18 months and once the stems reach the top of the post and hang down. Too little sun, too much nitrogen fertilizer, or no pruning can also delay flowering. Give it full sun, switch to a fertilizer higher in phosphorus and potassium, and let mature stems cascade over the trellis.",
   },
   {
     id: "3",
-    category: "Watering",
-    question: "Gaano kadalas dapat magdilig?",
-    questionEn: "How often should I water my plants?",
+    category: "Pollination",
+    question: "Kailangan bang i-hand-pollinate ang bulaklak?",
+    questionEn: "Do I need to hand-pollinate the flowers?",
     answer:
-      "Check the soil first — stick a finger about 2-3 cm deep. If it's dry, water; if it's still moist, wait. Most plants prefer a deep soak when dry over a little water every day.",
+      "Dragon fruit flowers open only for one night. Some varieties self-pollinate, but many (especially red-fleshed ones) need help. Between about 8 PM and early morning, use a soft brush to move pollen from the anthers to the stigma — or cross-pollinate between different plants for better fruit set.",
   },
   {
     id: "4",
-    category: "Watering",
-    question: "Ano ang signs ng sobrang tubig?",
-    questionEn: "What are the signs of overwatering?",
+    category: "Plant Health",
+    question: "Bakit naninilaw ang stems ng dragon fruit?",
+    questionEn: "Why are my dragon fruit stems turning yellow?",
     answer:
-      "Yellowing leaves, mushy stems, mold on the soil, and a sour smell usually mean overwatering. Let the soil dry out, improve drainage, and make sure the pot isn't sitting in standing water.",
+      "Yellow stems usually mean too much water or poor drainage, but sunburn and nutrient deficiency can cause it too. Let the soil dry between waterings, make sure the base isn't sitting in water, and give young plants some afternoon shade during the hottest months. Soft, mushy yellow patches can be stem rot — cut those off.",
   },
   {
     id: "5",
-    category: "Sunlight & Soil",
-    question: "Magkano dapat ang sikat ng araw?",
-    questionEn: "How much sunlight do my plants need?",
+    category: "Watering",
+    question: "Gaano kadalas diligan ang dragon fruit?",
+    questionEn: "How often should I water a dragon fruit plant?",
     answer:
-      "Most gulay and fruiting plants want 6+ hours of direct sun. Leafy greens and many indoor plants do fine with bright, indirect light. Observe your space for a day to find the sunniest spots.",
+      "It's a climbing cactus, so it hates soggy roots. Water deeply when the top few cm of soil are dry — about once or twice a week in dry season, much less during rainy season. Water a bit more while it's flowering and fruiting, and always make sure excess water drains away.",
   },
   {
     id: "6",
     category: "Pest Control",
     question: "Paano puksain ang peste nang natural?",
-    questionEn: "How do I get rid of pests naturally?",
+    questionEn: "How do I control dragon fruit pests naturally?",
     answer:
-      "Try neem oil, a mild soap-and-water spray, or hand-picking pests off leaves. Keep plants healthy and spaced for airflow, and remove affected leaves early. Ask the chatbot for the specific pest you're seeing.",
+      "Common pests are mealybugs, scale insects, ants, and snails or slugs. Spray neem oil or mild soapy water on affected stems, wipe off mealybugs with alcohol on cotton, and hand-pick snails at night. Keep the base weeded and airy, and cut off any rotting stems early. Ask the chatbot about the specific pest you see.",
   },
   {
     id: "7",
-    category: "Pest Control",
-    question: "Bakit naninilaw ang dahon?",
-    questionEn: "Why are my leaves turning yellow?",
+    category: "Harvest",
+    question: "Kailan dapat anihin ang dragon fruit?",
+    questionEn: "When should I harvest dragon fruit?",
     answer:
-      "Yellow leaves can mean overwatering, poor drainage, too little light, or nutrient deficiency. Check watering and light first — those are the most common causes. Describe it to the chatbot for a tailored fix.",
+      "Harvest about 30-35 days after the flower blooms. The skin turns fully bright red or pink, the 'wings' or scales start to dry at the tips, and the fruit gives slightly when pressed. Twist it gently or cut it from the stem — don't wait too long or it may crack.",
   },
 ];
 

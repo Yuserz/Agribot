@@ -1,19 +1,21 @@
 /**
- * Plant topics & care actions for the home quick-access grid.
+ * Dragon fruit topics & care actions for the home quick-access grid.
  *
  * 👩‍🌾 ADMIN / EDITOR GUIDE
  * ------------------------------------------------------------------
- * To add a plant your users can ask about, just add an object to
- * `PLANT_TOPICS` below. Nothing else needs to change — the home screen
- * renders this list automatically and taps send `prompt` to the chatbot.
+ * Each card is one dragon fruit (pitaya) subtopic — planting, trellis,
+ * pruning, pollination, and so on. To add a subtopic your users can ask
+ * about, just add an object to `PLANT_TOPICS` below. Nothing else needs to
+ * change — the home screen renders this list automatically and taps send
+ * `prompt` to the chatbot.
  *
  * Fields:
  *   id       unique string (keep it stable once shipped)
- *   name     short display name, Taglish is welcome (e.g. "Kamatis")
+ *   name     short display name, Taglish is welcome (e.g. "Pruning")
  *   emoji    one emoji shown big on the card
  *   color    accent / icon color (hex)
  *   bgColor  soft card background (hex, light tint of `color`)
- *   prompt   the exact message sent to the chatbot when tapped
+ *   prompt   the exact dragon fruit question sent to the chatbot when tapped
  *
  * `icon` names come from MaterialCommunityIcons.
  * ------------------------------------------------------------------
@@ -37,83 +39,83 @@ export interface CareAction {
   prompt: string;
 }
 
-/** Plants users can tap to start a chat. Add freely. */
+/** Dragon fruit subtopics users can tap to start a chat. Add freely. */
 export const PLANT_TOPICS: PlantTopic[] = [
   {
-    id: "kamatis",
-    name: "Kamatis",
-    emoji: "🍅",
-    color: "#A85C4A",
-    bgColor: "#F3E7E3",
-    prompt: "Paano magtanim at mag-alaga ng kamatis (tomato)? Teach me the basics, bes!",
-  },
-  {
-    id: "sili",
-    name: "Sili",
-    emoji: "🌶️",
-    color: "#B5763E",
-    bgColor: "#F4E9DE",
-    prompt: "How do I grow chili (sili) at home? Give me a beginner-friendly guide.",
-  },
-  {
-    id: "kangkong",
-    name: "Kangkong",
-    emoji: "🥬",
-    color: "#3E7A52",
-    bgColor: "#E6EFE6",
-    prompt: "Paano magtanim ng kangkong sa maliit na space? Quick tips please!",
-  },
-  {
-    id: "talong",
-    name: "Talong",
-    emoji: "🍆",
-    color: "#6B5A8A",
-    bgColor: "#EBE7F0",
-    prompt: "Help me grow eggplant (talong) — planting, watering, and harvesting.",
-  },
-  {
-    id: "herbs",
-    name: "Herbs",
-    emoji: "🌿",
+    id: "pagtatanim",
+    name: "Pagtatanim",
+    emoji: "🌱",
     color: "#2F8366",
     bgColor: "#E4EFE9",
-    prompt: "I want to start a small herb garden (basil, mint, oregano). Where do I begin?",
+    prompt: "Paano magtanim ng dragon fruit mula sa cutting? Teach me the basics, bes!",
   },
   {
-    id: "succulents",
-    name: "Succulents",
-    emoji: "🪴",
-    color: "#2C857A",
-    bgColor: "#E2EFEC",
-    prompt: "How do I take care of succulents indoors? They keep dying, bes 😭",
+    id: "poste",
+    name: "Poste/Trellis",
+    emoji: "🪵",
+    color: "#8A6A45",
+    bgColor: "#F2EBE2",
+    prompt: "Anong klaseng poste o trellis ang best para sa dragon fruit, and paano i-setup?",
   },
   {
-    id: "bulaklak",
-    name: "Bulaklak",
-    emoji: "🌸",
-    color: "#A8567C",
-    bgColor: "#F3E8EE",
-    prompt: "Give me tips for growing flowering plants (bulaklak) that bloom well.",
+    id: "pruning",
+    name: "Pruning",
+    emoji: "✂️",
+    color: "#6B5A8A",
+    bgColor: "#EBE7F0",
+    prompt: "Kailan at paano mag-prune ng dragon fruit para dumami ang bunga?",
   },
   {
-    id: "saging",
-    name: "Saging",
-    emoji: "🍌",
-    color: "#9C7E33",
+    id: "pollination",
+    name: "Pollination",
+    emoji: "🐝",
+    color: "#A37E33",
     bgColor: "#F4EEDD",
-    prompt: "Paano magtanim ng saging (banana) sa backyard? Walk me through it.",
+    prompt: "How do I hand-pollinate dragon fruit flowers at night? Step by step please.",
+  },
+  {
+    id: "pamumulaklak",
+    name: "Pamumulaklak",
+    emoji: "🌼",
+    color: "#B0206A",
+    bgColor: "#F7E6EE",
+    prompt: "Bakit hindi namumulaklak ang dragon fruit ko? Paano siya pamumulaklakin?",
+  },
+  {
+    id: "pamumunga",
+    name: "Pamumunga",
+    emoji: "🐉",
+    color: "#C2386F",
+    bgColor: "#F8E8EF",
+    prompt: "Paano palakihin at padamihin ang bunga ng dragon fruit? Fertilizer tips too!",
+  },
+  {
+    id: "peste",
+    name: "Peste",
+    emoji: "🐛",
+    color: "#A85C4A",
+    bgColor: "#F3E7E3",
+    prompt: "Anong mga peste at sakit ang common sa dragon fruit, and paano sila i-treat naturally?",
+  },
+  {
+    id: "ani",
+    name: "Ani",
+    emoji: "🧺",
+    color: "#215F4B",
+    bgColor: "#E3EDE8",
+    prompt: "Kailan dapat anihin ang dragon fruit? Paano malalaman kung hinog na?",
   },
 ];
 
-/** Generic care actions that work for any plant. */
+/** Core dragon fruit care actions. */
 export const CARE_ACTIONS: CareAction[] = [
   {
-    id: "planting",
-    label: "Planting",
-    icon: "seed",
+    id: "cutting",
+    label: "Cutting",
+    icon: "content-cut",
     color: "#2F8366",
     bgColor: "#E6EFE6",
-    prompt: "Give me general beginner tips for planting any plant from scratch.",
+    prompt: "Paano mag-propagate ng dragon fruit from cuttings? Gaano katagal bago mag-ugat?",
   },
   {
     id: "watering",
@@ -121,7 +123,7 @@ export const CARE_ACTIONS: CareAction[] = [
     icon: "water",
     color: "#3E6B7A",
     bgColor: "#E2ECEC",
-    prompt: "How do I know when and how much to water my plants?",
+    prompt: "Gaano kadalas dapat diligan ang dragon fruit? Cactus siya, so ayokong ma-overwater.",
   },
   {
     id: "pests",
@@ -129,14 +131,14 @@ export const CARE_ACTIONS: CareAction[] = [
     icon: "bug",
     color: "#A85C4A",
     bgColor: "#F3E7E3",
-    prompt: "How do I deal with common pests and plant diseases naturally?",
+    prompt: "How do I deal with common dragon fruit pests and stem rot naturally?",
   },
   {
-    id: "sunlight",
-    label: "Sunlight",
-    icon: "white-balance-sunny",
-    color: "#A37E33",
-    bgColor: "#F4EEDD",
-    prompt: "How much sunlight do different plants need? Help me place them right.",
+    id: "trellis",
+    label: "Trellis",
+    icon: "fence",
+    color: "#8A6A45",
+    bgColor: "#F2EBE2",
+    prompt: "How do I build and train a dragon fruit plant on a trellis or post?",
   },
 ];

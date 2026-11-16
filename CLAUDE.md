@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Tanim, Bes!** is an Expo (React Native) mobile app — a general plant-care assistant (any plant, Taglish/Gen Z tone). It pairs Supabase email/password auth with a Botpress-backed chat assistant. Cross-platform (Android, iOS, web). (Branched from the original "AgriBot" dragon-fruit variant.)
+**AgriBot** is an Expo (React Native) mobile app — a dragon fruit (pitaya) farming assistant (Taglish/Gen Z tone). It pairs Supabase email/password auth with a Botpress-backed chat assistant. Cross-platform (Android, iOS, web). This branch is the dragon-fruit variant; the general plant-care variant "Tanim, Bes!" lives on `feat/tanim-bes-revamp` (same codebase, different content/branding/palette).
 
-Branding strings live in [constants/brand.ts](constants/brand.ts) (`APP_NAME`, taglines, `BOT_NAME`) — change these to re-skin the identity. The app icon/wordmark is currently a 🌱 emoji (no logo image dependency on splash/welcome/chat).
+Branding strings live in [constants/brand.ts](constants/brand.ts) (`APP_NAME`, taglines, `BOT_NAME`) — change these to re-skin the identity. The app icon/wordmark is currently a 🐉 emoji (no logo image dependency on splash/welcome/chat).
 
 ## Commands
 
@@ -52,8 +52,8 @@ There is **no route guard component**. Gating is done imperatively: the splash s
 - `context/botpress.tsx` holds UI state (`ChatMessage[]`, loading flags) and exposes `useBotpress()`. On first init with empty history it sends a silent `"hi"` ping; that ping is stripped from history so it never renders. `pendingMessage` lets other screens (e.g. Home quick-actions) preload text into the chat input. `startNewConversation` clears the stored conversation id and re-inits via a `sessionKey` bump.
 - The WebView config in `constants/botpress.ts` (`BOTPRESS_URL`, `WEBVIEW_CONFIG`) is legacy/unused by the current REST-based flow.
 
-**Home quick-access topics** ([constants/plantTopics.ts](constants/plantTopics.ts)): the plants and care actions shown on the Home screen come from `PLANT_TOPICS` and `CARE_ACTIONS` here — this is the "admin/me-editable" list. Add an object to `PLANT_TOPICS` (id, name, emoji, color, bgColor, prompt) and the Home grid renders it automatically; tapping a card sets `pendingMessage` to its `prompt` and navigates to the chat. No backend — to make it remotely editable later, swap this static array for a Supabase fetch.
+**Home quick-access topics** ([constants/plantTopics.ts](constants/plantTopics.ts)): the dragon fruit subtopics (planting, trellis, pruning, pollination, flowering, fruiting, pests, harvest) and care actions shown on the Home screen come from `PLANT_TOPICS` and `CARE_ACTIONS` here — this is the "admin/me-editable" list. Add an object to `PLANT_TOPICS` (id, name, emoji, color, bgColor, prompt) and the Home grid renders it automatically; tapping a card sets `pendingMessage` to its `prompt` and navigates to the chat. No backend — to make it remotely editable later, swap this static array for a Supabase fetch.
 
-**Theming** (`constants/theme.ts`): centralized `Colors` object, "Emerald & Gold" palette. Use `Colors.brand.*` (`primary` `#15654A`, `accent` `#C9A24B`, `gradient`, `gradientShort`, `tintSoft`). `Colors.ui.*` holds the flat UI palette and tip color sets. Header text over the gradient uses a `textShadow` for legibility on the yellow end. `light`/`dark` blocks exist but the app is effectively brand-colored, not dark-mode-themed.
+**Theming** (`constants/theme.ts`): centralized `Colors` object, "Pitaya" palette. Use `Colors.brand.*` (`primary` `#B0206A` magenta, `accent` `#2F8366` green, `gradient`, `gradientShort`, `tintSoft`; `goldGradient` is now a green accent gradient, name kept for call sites). `Colors.ui.*` holds the flat UI palette and tip color sets. Header text over the gradient uses a `textShadow` for legibility on the pink end. `light`/`dark` blocks exist but the app is effectively brand-colored, not dark-mode-themed.
 
 UI uses `react-native-reanimated` for entrance animations (`FadeIn`, `FadeInDown`, etc.), `expo-linear-gradient` for the brand gradient, `@expo/vector-icons` (MaterialCommunityIcons / Ionicons) for icons, `react-native-markdown-display` for bot message rendering, and `expo-speech` for TTS.

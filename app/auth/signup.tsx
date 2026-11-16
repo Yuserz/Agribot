@@ -77,7 +77,7 @@ export default function SignUpScreen() {
         {/* Title */}
         <Animated.View entering={FadeInDown.delay(100).duration(450)}>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join Tanim, Bes! and start your plant journey</Text>
+          <Text style={styles.subtitle}>Join AgriBot and start your dragon fruit journey</Text>
         </Animated.View>
 
         {/* Full Name */}
