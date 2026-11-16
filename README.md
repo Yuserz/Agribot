@@ -19,13 +19,28 @@ Before running this app, ensure you have the following installed:
 
 ### Required
 
-- **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
-- **pnpm** (v8 or higher) - Install globally using:
+- **Node.js** (v20.19 or higher) - [Download](https://nodejs.org/)
+- **pnpm** (v11 or higher; the setup script installs it for you) - Install globally using:
   ```bash
   npm install -g pnpm
   ```
 
 ## Get started
+
+### Quick setup (recommended)
+
+The setup script checks Node (20.19+), installs pnpm if missing, and installs dependencies.
+
+- **Windows (PowerShell):**
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File scripts\setup.ps1          # add -Start to launch, -Tunnel for tunnel mode
+  ```
+- **macOS / Linux / Git Bash:**
+  ```bash
+  ./scripts/setup.sh                                                   # add --start to launch, --tunnel for tunnel mode
+  ```
+
+### Manual setup
 
 1. Install dependencies
 
@@ -36,7 +51,9 @@ Before running this app, ensure you have the following installed:
 2. Start the app
 
    ```bash
-   npx expo start
+   pnpm start          # scan the QR code with Expo Go (same Wi-Fi)
+   pnpm start:tunnel   # phone on a different network
+   pnpm start:clear    # clear the Metro cache if things act up
    ```
 
 In the output, you'll find options to open the app in a
