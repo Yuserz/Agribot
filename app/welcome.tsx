@@ -23,8 +23,8 @@ interface FeatureItem {
 }
 
 const features: FeatureItem[] = [
-  { id: 1, emoji: "🌱", title: "Kahit anong halaman", description: "Tips for any plant — gulay, herbs, succulents, bulaklak" },
-  { id: 2, emoji: "💬", title: "Itanong mo lang", description: "Chat with your plant bestie, walang judging" },
+  { id: 1, emoji: "🐉", title: "Dragon fruit expert", description: "Tips from cutting, trellis, pollination, hanggang ani" },
+  { id: 2, emoji: "💬", title: "Itanong mo lang", description: "Chat with your dragon fruit bestie, walang judging" },
   { id: 3, emoji: "⏰", title: "24/7 na handa", description: "Get help anytime, day or night" },
 ];
 
@@ -49,7 +49,7 @@ export default function WelcomeScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.logoBox}
           >
-            <Text style={styles.logoEmoji}>🌱</Text>
+            <Text style={styles.logoEmoji}>🐉</Text>
           </LinearGradient>
         </Animated.View>
 

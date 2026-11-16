@@ -1,16 +1,18 @@
-# Tanim, Bes! 🌱
+# AgriBot 🐉
 
-**Tanim, Bes!** is a mobile application built with [Expo](https://expo.dev) — a friendly, general plant-care assistant for *any* plant, with a Taglish/Gen Z tone. It pairs Supabase email/password authentication with a Botpress-backed chat assistant to help you plan, grow, and care for your halaman.
+**AgriBot** is a mobile application built with [Expo](https://expo.dev) — a friendly dragon fruit (pitaya) farming assistant with a Taglish/Gen Z tone. It pairs Supabase email/password authentication with a Botpress-backed chat assistant to help you grow dragon fruit from cutting to harvest.
 
-## About Tanim, Bes!
+> This branch is the dragon-fruit-only variant. The general plant-care variant, **Tanim, Bes!**, lives on `feat/tanim-bes-revamp`. Both share the same codebase and differ only in content, branding, and palette.
 
-Tanim, Bes! makes plant care approachable for everyone by offering:
+## About AgriBot
 
-- **AI-powered Chatbot**: Ask anything about any plant and get instant, friendly answers
-- **Quick-access Plant Topics**: Tap a plant or care action on the Home screen to jump straight into a chat
-- **Frequently Asked Questions (FAQ)**: Common plant-care knowledge at a glance
+AgriBot makes dragon fruit farming approachable by offering:
+
+- **AI-powered Chatbot**: Ask anything about dragon fruit and get instant, friendly answers
+- **Quick-access Dragon Fruit Topics**: Tap a topic (planting, trellis, pruning, pollination, pests, harvest…) or care action on the Home screen to jump straight into a chat
+- **Frequently Asked Questions (FAQ)**: Common dragon fruit questions at a glance
 - **Bilingual UI**: Taglish by default, with a one-tap toggle to full English
-- **User Authentication**: Secure login and signup via Supabase
+- **User Authentication**: Secure login and signup via Supabase, plus guest mode
 - **User Profiles**: Edit your name, upload an avatar, and manage your account
 
 Cross-platform for Android, iOS, and web.

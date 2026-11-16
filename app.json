@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Tanim, Bes!",
-    "slug": "tanim-bes",
+    "name": "AgriBot",
+    "slug": "agribot",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tanimbes",
+    "scheme": "agribot",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
@@ -17,7 +17,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.tanimbes.app"
+      "package": "com.agribot.app"
     },
     "web": {
       "output": "static",

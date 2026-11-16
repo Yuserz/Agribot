@@ -1,47 +1,47 @@
 /**
  * App color palette and fonts.
  *
- * Brand identity: "Tanim, Bes!" — a premium botanical theme.
- * Deep emerald + champagne gold over warm ivory neutrals.
+ * Brand identity: "AgriBot" — a dragon fruit (pitaya) theme.
+ * Pitaya magenta + scale/leaf green over faintly pink-warm neutrals.
  * Use the `Colors.brand.*` and `Colors.ui.*` tokens instead of hardcoding hex.
  */
 
 import { Platform } from "react-native";
 
-const tintColorLight = "#15654A";
-const tintColorDark = "#1F8A63";
+const tintColorLight = "#B0206A";
+const tintColorDark = "#D9457F";
 
-// Premium "Emerald & Gold" brand palette
+// "Pitaya" brand palette
 const brand = {
-  primary: "#15654A", // deep emerald — safe with white text
-  light: "#1F8A63", // emerald highlight
-  dark: "#0C4030", // forest
-  accent: "#C9A24B", // champagne gold
-  accentDark: "#A37E33", // deep gold
-  // Refined, near-monochrome emerald gradient (headers, splash, buttons)
-  gradient: ["#0C4030", "#15654A", "#1F8A63"] as const,
-  gradientShort: ["#15654A", "#1F8A63"] as const,
-  // Gold gradient reserved for premium accents / spotlight CTAs
-  goldGradient: ["#D8B85F", "#C9A24B"] as const,
+  primary: "#B0206A", // pitaya magenta — safe with white text
+  light: "#D9457F", // magenta highlight
+  dark: "#7A1247", // deep pitaya
+  accent: "#2F8366", // green, for the fruit's scales/leaves
+  accentDark: "#215F4B", // deep green
+  // Magenta gradient (headers, splash, buttons)
+  gradient: ["#7A1247", "#B0206A", "#D9457F"] as const,
+  gradientShort: ["#B0206A", "#D9457F"] as const,
+  // Green accent gradient for spotlight CTAs (name kept so call sites don't change)
+  goldGradient: ["#3A9A78", "#2F8366"] as const,
   // Soft tints for pressed states / subtle backgrounds
-  tintSoft: "rgba(21, 101, 74, 0.08)",
-  tintSoftBorder: "rgba(21, 101, 74, 0.14)",
-  goldSoft: "rgba(201, 162, 75, 0.14)",
-  goldSoftBorder: "rgba(201, 162, 75, 0.30)",
+  tintSoft: "rgba(176, 32, 106, 0.08)",
+  tintSoftBorder: "rgba(176, 32, 106, 0.14)",
+  goldSoft: "rgba(47, 131, 102, 0.14)",
+  goldSoftBorder: "rgba(47, 131, 102, 0.30)",
 };
 
 export const Colors = {
   light: {
-    text: "#16201B",
+    text: "#22171C",
     background: "#fff",
     tint: tintColorLight,
-    icon: "#5C6660",
-    tabIconDefault: "#9AA39D",
+    icon: "#6A5F64",
+    tabIconDefault: "#A59BA0",
     tabIconSelected: tintColorLight,
   },
   dark: {
     text: "#ECEDEE",
-    background: "#0E1512",
+    background: "#160E12",
     tint: tintColorDark,
     icon: "#9BA1A6",
     tabIconDefault: "#9BA1A6",
@@ -51,13 +51,13 @@ export const Colors = {
   ui: {
     // General UI colors
     white: "#ffffff",
-    textPrimary: "#16201B", // deep charcoal-green
-    textSecondary: "#5C6660", // muted sage-gray
-    textMuted: "#9AA39D",
+    textPrimary: "#22171C", // deep charcoal-plum
+    textSecondary: "#6A5F64", // muted mauve-gray
+    textMuted: "#A59BA0",
     background: "#ffffff",
-    backgroundAlt: "#F6F4EE", // warm ivory
-    shadowColor: "#13241C", // green-tinted shadow for cohesion
-    hairline: "#ECEAE2", // subtle borders/dividers
+    backgroundAlt: "#F8F3F4", // faintly pink-warm neutral
+    shadowColor: "#2A1220", // magenta-tinted shadow for cohesion
+    hairline: "#EFE7EA", // subtle borders/dividers
 
     // Card colors
     cardBackground: "#ffffff",
@@ -73,10 +73,10 @@ export const Colors = {
     pruningBg: "#EBE7F0",
 
     // Tips backgrounds (muted, tonal)
-    tipBgYellow: "#F4EEDD",
-    tipBgBlue: "#E2ECEA",
-    tipBgGreen: "#E6EFE6",
-    tipIconColor: "#15654A",
+    tipBgYellow: "#F8E8EF", // soft pitaya pink
+    tipBgBlue: "#F1E9F2", // soft orchid
+    tipBgGreen: "#E4EFE9", // soft leaf green
+    tipIconColor: "#B0206A",
   },
 };
 

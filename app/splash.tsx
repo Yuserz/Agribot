@@ -1,7 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { APP_NAME, APP_TAGLINE } from "@/constants/brand";
 import { Colors } from "@/constants/theme";
@@ -10,15 +11,17 @@ import { useAuth } from "@/context/auth";
 export default function SplashScreen() {
   const router = useRouter();
   const { session, isGuest, loading } = useAuth();
+  const insets = useSafeAreaInsets();
 
-  const logoScale = useRef(new Animated.Value(0.5)).current;
-  const logoOpacity = useRef(new Animated.Value(0)).current;
-  const textOpacity = useRef(new Animated.Value(0)).current;
-  const dotOpacity = useRef([
+  // Lazy useState keeps these Animated values stable across renders without reading refs during render.
+  const [logoScale] = useState(() => new Animated.Value(0.5));
+  const [logoOpacity] = useState(() => new Animated.Value(0));
+  const [textOpacity] = useState(() => new Animated.Value(0));
+  const [dotOpacity] = useState(() => [
     new Animated.Value(0.3),
     new Animated.Value(0.3),
     new Animated.Value(0.3),
-  ]).current;
+  ]);
 
   useEffect(() => {
     Animated.sequence([
@@ -51,7 +54,7 @@ export default function SplashScreen() {
     }, 2800);
 
     return () => clearTimeout(timer);
-  }, [loading, session, isGuest]);
+  }, [loading, session, isGuest, router, logoScale, logoOpacity, textOpacity, dotOpacity]);
 
   return (
     <LinearGradient
@@ -67,7 +70,7 @@ export default function SplashScreen() {
             { opacity: logoOpacity, transform: [{ scale: logoScale }] },
           ]}
         >
-          <Text style={styles.logoEmoji}>🌱</Text>
+          <Text style={styles.logoEmoji}>🐉</Text>
         </Animated.View>
 
         <Animated.View style={{ opacity: textOpacity, alignItems: "center" }}>
@@ -75,7 +78,7 @@ export default function SplashScreen() {
           <Text style={styles.subtitle}>{APP_TAGLINE}</Text>
         </Animated.View>
 
-        <View style={styles.dotsContainer}>
+        <View style={[styles.dotsContainer, { bottom: insets.bottom + 32 }]}>
           {dotOpacity.map((opacity, index) => (
             <Animated.View key={index} style={[styles.dot, { opacity }]} />
           ))}

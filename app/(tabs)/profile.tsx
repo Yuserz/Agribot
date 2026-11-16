@@ -250,6 +250,10 @@ export default function ProfileScreen() {
         {/* About */}
         <Animated.View entering={FadeInUp.delay(400).duration(400)} style={styles.aboutContainer}>
           <Text style={styles.aboutTitle}>About {APP_NAME}</Text>
+          <Text style={styles.aboutBlurb}>
+            {APP_NAME} is your dragon fruit (pitaya) farming assistant — ask about planting
+            cuttings, trellis setup, pruning, night pollination, pests, and harvest anytime.
+          </Text>
           <View style={styles.aboutContent}>
             <Text style={styles.aboutLabel}>Version</Text>
             <Text style={styles.aboutValue}>1.0.0</Text>
@@ -437,6 +441,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   aboutTitle: { fontSize: 15, fontWeight: "700", color: Colors.ui.textPrimary, marginBottom: 12 },
+  aboutBlurb: { fontSize: 13, color: Colors.ui.textSecondary, lineHeight: 19, marginBottom: 12 },
   aboutContent: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   aboutLabel: { fontSize: 14, color: Colors.ui.textSecondary },
   aboutValue: { fontSize: 14, fontWeight: "600", color: Colors.brand.primary },

@@ -1,4 +1,4 @@
-# Tanim, Bes! — developer shortcuts
+# AgriBot — developer shortcuts
 # Run `make help` to list available commands.
 
 .DEFAULT_GOAL := help

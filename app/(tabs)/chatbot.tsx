@@ -233,7 +233,7 @@ export default function ChatbotScreen() {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
         <ActivityIndicator size="large" color={Colors.brand.primary} />
-        <Text style={styles.connectingText}>{isEnglish ? "Connecting... 🌱" : "Sandali lang, bes... 🌱"}</Text>
+        <Text style={styles.connectingText}>{isEnglish ? "Connecting... 🐉" : "Sandali lang, bes... 🐉"}</Text>
       </SafeAreaView>
     );
   }
@@ -247,7 +247,7 @@ export default function ChatbotScreen() {
       <Animated.View entering={FadeIn.duration(350)} style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.headerLogo}>
-            <Text style={styles.headerLogoEmoji}>🌱</Text>
+            <Text style={styles.headerLogoEmoji}>🐉</Text>
           </View>
           <Text style={styles.headerTitle}>{BOT_NAME}</Text>
         </View>
@@ -266,7 +266,9 @@ export default function ChatbotScreen() {
       </Animated.View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // Android is edge-to-edge (SDK 54+), so the window no longer resizes for the
+        // keyboard — "padding" is needed on both platforms to keep the input visible.
+        behavior="padding"
         style={styles.keyboardAvoidingView}
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
