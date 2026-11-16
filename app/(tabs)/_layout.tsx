@@ -1,10 +1,15 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
+  // Android is edge-to-edge, so the system nav bar overlaps the tab bar unless we
+  // add its inset back on top of our fixed height/padding.
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -15,9 +20,9 @@ export default function TabLayout() {
           backgroundColor: Colors.ui.background,
           borderTopWidth: 1,
           borderTopColor: "#e0e0e0",
-          paddingBottom: 8,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 8,
-          height: 70,
+          height: 70 + insets.bottom,
         },
         tabBarLabelStyle: {
           fontSize: 12,
